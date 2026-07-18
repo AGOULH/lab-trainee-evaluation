@@ -69,13 +69,7 @@ export const firebaseConfig = {
 | الحساب | اسم المستخدم | كلمة المرور |
 |---|---|---|
 | مسؤول التدريب | `admin` | `admin123` |
-| Reception | `reception` | `reception123` |
-| OPD | `opd` | `opd123` |
-| Chemistry | `chemistry` | `chemistry123` |
-| Hematology | `hematology` | `hematology123` |
-| VIRO | `viro` | `viro123` |
-| Blood Bank | `bloodbank` | `bloodbank123` |
-| Micro | `micro` | `micro123` |
+| كل الأقسام السبعة | `reception` / `opd` / `chemistry` / `hematology` / `viro` / `bloodbank` / `micro` | `1234` |
 
 > 🔒 **يُنصح بتغيير كلمات المرور** بعد أول دخول: من Firestore Console افتح مجموعة `users` واستبدل حقل `passHash` بقيمة SHA-256 لكلمة المرور الجديدة (يمكن توليدها من أي أداة SHA-256 عبر الإنترنت).
 

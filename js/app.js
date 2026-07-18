@@ -65,7 +65,7 @@ const DEFAULT_USERS = [
   { username: "admin", role: "admin", label: "مسؤول التدريب", password: "admin123" },
   ...DEPARTMENTS.map((d) => ({
     username: d.id, role: "dept", dept: d.id,
-    label: `قسم ${d.ar}`, password: `${d.id}123`,
+    label: `قسم ${d.ar}`, password: "1234",
   })),
 ];
 
