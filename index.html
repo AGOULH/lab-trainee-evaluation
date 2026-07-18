@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نظام إدارة وتقييم متدربي المختبر</title>
+  <meta name="description" content="نظام إدارة وتقييم متدربي المختبرات — جداول تدريب، حضور وانصراف، وتقييم الأقسام" />
+  <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;🧪&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════ شاشة الإعداد (تظهر فقط قبل ضبط Firebase) ═══════════ -->
+  <div id="setup-screen" class="fullscreen-center hidden">
+    <div class="setup-card animate-pop">
+      <div class="setup-icon">⚙️</div>
+      <h1>يلزم ضبط إعداد Firebase</h1>
+      <p>لم يتم إدخال بيانات مشروع Firebase بعد. افتح الملف
+        <code dir="ltr">js/firebase-config.js</code>
+        والصق بيانات مشروعك (config) ثم أعد تحميل الصفحة.</p>
+      <ol class="setup-steps">
+        <li>ادخل إلى <span dir="ltr">console.firebase.google.com</span> وأنشئ مشروعًا جديدًا (أو استخدم مشروعًا موجودًا).</li>
+        <li>من القائمة: <b>Build ← Firestore Database ← Create database</b> واختر وضع <b>Start in production mode</b> ثم عدّل القواعد كما في ملف README.</li>
+        <li>من <b>Project settings ← General ← Your apps</b> أضف تطبيق ويب <b>&lt;/&gt;</b> وانسخ كائن <code dir="ltr">firebaseConfig</code>.</li>
+        <li>الصق القيم داخل <code dir="ltr">js/firebase-config.js</code> وارفع التعديل إلى GitHub.</li>
+      </ol>
+      <p class="muted">التفاصيل الكاملة في ملف <b>README.md</b> داخل المستودع.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════ شاشة الدخول ═══════════ -->
+  <div id="login-screen" class="fullscreen-center hidden">
+    <div class="login-wrap">
+      <div class="login-brand animate-fade-down">
+        <div class="brand-badge">🧪</div>
+        <h1>نظام متدربي المختبر</h1>
+        <p>إدارة التسجيل، الجداول، الحضور، والتقييم</p>
+      </div>
+
+      <div class="login-card animate-pop">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="staff" role="tab">دخول الموظفين</button>
+          <button class="tab" data-tab="trainee" role="tab">استعلام المتدرب</button>
+        </div>
+
+        <form id="login-form" class="tab-panel" data-panel="staff">
+          <label class="field">
+            <span>اسم المستخدم</span>
+            <input type="text" id="login-username" autocomplete="username" required dir="ltr" placeholder="admin" />
+          </label>
+          <label class="field">
+            <span>كلمة المرور</span>
+            <input type="password" id="login-password" autocomplete="current-password" required dir="ltr" placeholder="••••••••" />
+          </label>
+          <p id="login-error" class="form-error hidden"></p>
+          <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+            <span class="btn-label">تسجيل الدخول</span>
+          </button>
+        </form>
+
+        <form id="trainee-lookup-form" class="tab-panel hidden" data-panel="trainee">
+          <label class="field">
+            <span>رقم الهوية</span>
+            <input type="text" id="lookup-id" inputmode="numeric" required dir="ltr" placeholder="1234567890" />
+          </label>
+          <p id="lookup-error" class="form-error hidden"></p>
+          <button type="submit" class="btn btn-primary btn-block">
+            <span class="btn-label">عرض جدولي التدريبي</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ استعلام المتدرب: عرض الجدول ═══════════ -->
+  <div id="trainee-portal" class="fullscreen-scroll hidden">
+    <div class="portal-inner">
+      <button class="btn btn-ghost" id="portal-back">→ عودة</button>
+      <div id="portal-content"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ هيكل التطبيق ═══════════ -->
+  <div id="app-shell" class="app-shell hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-badge sm">🧪</div>
+        <div>
+          <strong>متدربو المختبر</strong>
+          <small id="sidebar-role"></small>
+        </div>
+      </div>
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-block" id="theme-toggle">🌙 الوضع الداكن</button>
+        <button class="btn btn-ghost btn-block danger" id="logout-btn">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <header class="topbar">
+        <button class="icon-btn" id="menu-btn" aria-label="القائمة">☰</button>
+        <h2 id="topbar-title"></h2>
+        <div class="topbar-user" id="topbar-user"></div>
+      </header>
+      <main class="content" id="content"><!-- views injected here --></main>
+    </div>
+    <div class="sidebar-scrim hidden" id="sidebar-scrim"></div>
+  </div>
+
+  <!-- ═══════════ منطقة الطباعة ═══════════ -->
+  <div id="print-root"></div>
+
+  <!-- ═══════════ نافذة منبثقة عامة ═══════════ -->
+  <div id="modal-scrim" class="modal-scrim hidden">
+    <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+  </div>
+
+  <div id="toast-stack" class="toast-stack"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
