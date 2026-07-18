@@ -8,12 +8,12 @@
 // ═══════════════════════════════════════════════════════════════
 
 export const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_YOUR_SENDER_ID",
-  appId: "PASTE_YOUR_APP_ID",
+  apiKey: "AIzaSyCnKDKrmQcjs4Q96SuqR7kvbkYY1_weBSI",
+  authDomain: "lab-trainee-evaluation.firebaseapp.com",
+  projectId: "lab-trainee-evaluation",
+  storageBucket: "lab-trainee-evaluation.firebasestorage.app",
+  messagingSenderId: "252826002833",
+  appId: "1:252826002833:web:76b093fbd2736a8d906630",
 };
 
 // يصبح التطبيق جاهزًا تلقائيًا بمجرد استبدال القيم أعلاه بقيم مشروعك.
