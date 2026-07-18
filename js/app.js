@@ -553,6 +553,7 @@ async function renderTrainees() {
               <td>${status}</td>
               <td><div class="row-actions">
                 <button class="btn btn-outline btn-sm" data-act="view" data-id="${t.id}">👁 التفاصيل</button>
+                <button class="btn btn-outline btn-sm" data-act="edit" data-id="${t.id}">✏️ تعديل</button>
                 <button class="btn btn-outline btn-sm" data-act="sheet" data-id="${t.id}">🖨 Time Sheet</button>
                 <button class="btn btn-ghost btn-sm danger" data-act="del" data-id="${t.id}">🗑</button>
               </div></td></tr>`;
@@ -561,6 +562,7 @@ async function renderTrainees() {
     $$("#trainee-table [data-act]").forEach((b) => b.addEventListener("click", () => {
       const t = trainees.find((x) => x.id === b.dataset.id);
       if (b.dataset.act === "view") openTraineeModal(t);
+      if (b.dataset.act === "edit") openEditModal(t, trainees);
       if (b.dataset.act === "sheet") printTimesheet(t);
       if (b.dataset.act === "del") confirmDelete(t);
     }));
@@ -588,6 +590,115 @@ function confirmDelete(t) {
       closeModal(); toast("تم حذف المتدرب");
       go(currentView);
     } catch { toast("تعذر الحذف", "err"); }
+  });
+}
+
+function openEditModal(t, trainees) {
+  const selMonths = DURATIONS.find((d) => d.months === t.months) ? t.months : "custom";
+  const customMonths = selMonths === "custom" ? t.months : 1;
+
+  openModal(`
+    <div class="modal-head"><h3>✏️ تعديل بيانات المتدرب</h3>
+      <button class="icon-btn" id="ed-close">✕</button></div>
+    <form id="edit-form">
+      <div class="field-row">
+        <label class="field"><span>اسم المتدرب</span>
+          <input id="ed-name" required value="${esc(t.name)}" /></label>
+        <label class="field"><span>رقم الهوية</span>
+          <input id="ed-nid" required inputmode="numeric" dir="ltr" value="${esc(t.nationalId)}" /></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>تاريخ بداية التدريب</span>
+          <input id="ed-start" type="date" required value="${t.startDate}" /></label>
+        <label class="field"><span>مدة التدريب</span>
+          <select id="ed-months">
+            ${DURATIONS.map((d) => `<option value="${d.months}" ${d.months === t.months ? "selected" : ""}>${d.label}</option>`).join("")}
+            <option value="custom" ${selMonths === "custom" ? "selected" : ""}>مدة أخرى…</option>
+          </select></label>
+      </div>
+      <label class="field ${selMonths !== "custom" ? "hidden" : ""}" id="ed-custom-wrap"><span>عدد الأشهر</span>
+        <input id="ed-custom-months" type="number" min="1" max="24" value="${customMonths}" /></label>
+
+      <div class="field">
+        <span>الأقسام</span>
+        <div class="dept-picker" id="ed-depts">
+          <button type="button" class="dept-chip ${t.deptIds.length === DEPARTMENTS.length ? "on" : ""} all" data-all>✔ كل الأقسام</button>
+          ${DEPARTMENTS.map((d) => `<button type="button" class="dept-chip ${t.deptIds.includes(d.id) ? "on" : ""}" data-dept="${d.id}">${d.ar} · ${d.en}</button>`).join("")}
+        </div>
+      </div>
+
+      <div class="card" style="background:var(--surface-2);box-shadow:none" id="ed-preview"></div>
+
+      <p id="ed-error" class="form-error hidden"></p>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" id="ed-cancel">إلغاء</button>
+        <button type="submit" class="btn btn-primary" id="ed-save">💾 حفظ التعديلات</button>
+      </div>
+    </form>`);
+
+  const edMonths = () => $("#ed-months").value === "custom"
+    ? Math.max(1, Number($("#ed-custom-months").value) || 1)
+    : Number($("#ed-months").value);
+  const edDepts = () => $$("#ed-depts .dept-chip[data-dept].on").map((c) => c.dataset.dept);
+
+  const preview = () => {
+    const months = edMonths(), depts = edDepts(), start = $("#ed-start").value, box = $("#ed-preview");
+    if (!start || !depts.length) { box.innerHTML = `<p class="muted" style="margin:0">اختر التاريخ والأقسام لعرض معاينة الجدول</p>`; return; }
+    const sched = generateSchedule(start, months, depts);
+    box.innerHTML = `<h4 style="margin:0 0 10px;font-size:14px">معاينة الجدول التدريبي</h4>` + scheduleTimelineHTML({ schedule: sched });
+  };
+
+  $("#ed-months").addEventListener("change", () => {
+    $("#ed-custom-wrap").classList.toggle("hidden", $("#ed-months").value !== "custom");
+    preview();
+  });
+  $("#ed-custom-months").addEventListener("input", preview);
+  $("#ed-start").addEventListener("change", preview);
+
+  const allChip = $("#ed-depts [data-all]");
+  const syncAll = () => allChip.classList.toggle("on", edDepts().length === DEPARTMENTS.length);
+  allChip.addEventListener("click", () => {
+    const on = !allChip.classList.contains("on");
+    $$("#ed-depts .dept-chip[data-dept]").forEach((c) => c.classList.toggle("on", on));
+    syncAll(); preview();
+  });
+  $$("#ed-depts .dept-chip[data-dept]").forEach((c) => c.addEventListener("click", () => {
+    c.classList.toggle("on"); syncAll(); preview();
+  }));
+  preview();
+
+  $("#ed-close").addEventListener("click", closeModal);
+  $("#ed-cancel").addEventListener("click", closeModal);
+
+  $("#edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = $("#ed-error");
+    errEl.classList.add("hidden");
+    const depts = edDepts();
+    if (!depts.length) { errEl.textContent = "اختر قسمًا واحدًا على الأقل"; errEl.classList.remove("hidden"); return; }
+    const newNid = $("#ed-nid").value.trim();
+    const dupCheck = newNid !== t.nationalId
+      ? trainees.find((x) => x.id !== t.id && x.nationalId === newNid)
+      : null;
+    if (dupCheck) { errEl.textContent = "رقم الهوية مستخدم من قِبل متدرب آخر"; errEl.classList.remove("hidden"); return; }
+    const btn = $("#ed-save");
+    btn.disabled = true;
+    try {
+      const months = edMonths();
+      const startDate = $("#ed-start").value;
+      await setDoc(doc(db, "trainees", t.id), {
+        name: $("#ed-name").value.trim(),
+        nationalId: newNid,
+        startDate, months,
+        deptIds: depts,
+        schedule: generateSchedule(startDate, months, depts),
+        createdAt: t.createdAt ?? null,
+        updatedAt: serverTimestamp(),
+      });
+      closeModal();
+      toast("تم حفظ التعديلات بنجاح");
+      go("trainees");
+    } catch { toast("تعذر الحفظ — تحقق من الاتصال", "err"); btn.disabled = false; }
   });
 }
 
