@@ -219,6 +219,11 @@ $("#logout-btn").addEventListener("click", () => { session.user = null; show("lo
 
 // ─────────────── الدخول ───────────────
 
+// قائمة الحسابات: مسؤول التدريب + الأقسام السبعة
+$("#login-username").innerHTML =
+  `<option value="admin">👤 مسؤول التدريب</option>` +
+  DEPARTMENTS.map((d) => `<option value="${d.id}">🧪 قسم ${d.ar} — ${d.en}</option>`).join("");
+
 $$(".tab").forEach((tab) => tab.addEventListener("click", () => {
   $$(".tab").forEach((t) => t.classList.toggle("active", t === tab));
   $$(".tab-panel").forEach((p) => p.classList.toggle("hidden", p.dataset.panel !== tab.dataset.tab));
