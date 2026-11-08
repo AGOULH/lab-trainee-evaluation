@@ -69,6 +69,43 @@ const DEFAULT_USERS = [
   })),
 ];
 
+// ─────────────── الأيقونات (SVG بنمط Lucide) ───────────────
+const ICON_PATHS = {
+  dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+  userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  clipboard: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+  book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+  moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  printer: '<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  pen: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m10.5 17.5 5-5-2-2-5 5V17.5z"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  graduation: '<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  checkCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  flask: '<path d="M9 3h6"/><path d="M10 3v6.5L4.5 19A1.5 1.5 0 0 0 5.8 21h12.4a1.5 1.5 0 0 0 1.3-2L14 9.5V3"/><path d="M7 15h10"/>',
+  menu: '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  arrowRight: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  lightbulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/>',
+  chevron: '<polyline points="6 9 12 15 18 9"/>',
+};
+const ic = (name, size = 18) =>
+  `<svg class="ic" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name] || ""}</svg>`;
+
 // ─────────────── أدوات مساعدة ───────────────
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -89,7 +126,7 @@ async function sha256(text) {
 function toast(msg, kind = "ok") {
   const el = document.createElement("div");
   el.className = `toast ${kind}`;
-  el.innerHTML = `<span>${kind === "ok" ? "✅" : "⚠️"}</span><span>${esc(msg)}</span>`;
+  el.innerHTML = `${ic(kind === "ok" ? "checkCircle" : "alert", 20)}<span>${esc(msg)}</span>`;
   $("#toast-stack").appendChild(el);
   setTimeout(() => { el.style.opacity = "0"; el.style.transition = "opacity .4s"; setTimeout(() => el.remove(), 400); }, 3400);
 }
@@ -154,13 +191,15 @@ function show(screen) {
 
 const NAV = {
   admin: [
-    { id: "dashboard",  icon: "📊", label: "لوحة المعلومات" },
-    { id: "register",   icon: "➕", label: "تسجيل متدرب" },
-    { id: "trainees",   icon: "👥", label: "المتدربون والبحث" },
-    { id: "reports",    icon: "📋", label: "التقييمات والتقارير" },
+    { id: "dashboard",  icon: "dashboard", label: "لوحة المعلومات" },
+    { id: "register",   icon: "userPlus", label: "تسجيل متدرب" },
+    { id: "trainees",   icon: "users", label: "المتدربون والبحث" },
+    { id: "reports",    icon: "clipboard", label: "التقييمات والتقارير" },
+    { id: "guide",      icon: "book", label: "دليل المستخدم" },
   ],
   dept: [
-    { id: "deptTrainees", icon: "👥", label: "متدربو القسم" },
+    { id: "deptTrainees", icon: "users", label: "متدربو القسم" },
+    { id: "guide",        icon: "book",  label: "دليل المستخدم" },
   ],
 };
 
@@ -170,14 +209,15 @@ function buildShell() {
   const u = session.user;
   const roleLabel = u.role === "admin" ? "مسؤول التدريب" : `قسم ${deptById(u.dept).ar} — ${deptById(u.dept).en}`;
   $("#sidebar-role").textContent = roleLabel;
-  $("#topbar-user").textContent = roleLabel;
+  $("#topbar-user").innerHTML = `<span class="avatar">${ic("user", 15)}</span><span class="who">${esc(roleLabel)}</span>`;
+  $("#topbar-user").title = roleLabel;
   const nav = $("#sidebar-nav");
   nav.innerHTML = "";
   NAV[u.role].forEach((item) => {
     const b = document.createElement("button");
     b.className = "nav-item";
     b.dataset.view = item.id;
-    b.innerHTML = `<span class="ni">${item.icon}</span>${item.label}`;
+    b.innerHTML = `<span class="ni">${ic(item.icon, 19)}</span><span>${item.label}</span>`;
     b.addEventListener("click", () => { go(item.id); closeSidebar(); });
     nav.appendChild(b);
   });
@@ -187,17 +227,22 @@ function buildShell() {
 
 function go(view) {
   currentView = view;
-  $$(".nav-item").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
+  $$(".nav-item").forEach((b) => {
+    b.classList.toggle("active", b.dataset.view === view);
+    if (b.dataset.view === view) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+  });
   const titles = {
     dashboard: "لوحة المعلومات", register: "تسجيل متدرب جديد",
     trainees: "المتدربون والبحث", reports: "التقييمات والتقرير النهائي",
-    deptTrainees: "متدربو القسم",
+    deptTrainees: "متدربو القسم", guide: "دليل المستخدم",
   };
   $("#topbar-title").textContent = titles[view] || "";
   const c = $("#content");
   c.innerHTML = `<div class="grid stagger"><div class="skeleton" style="height:90px"></div><div class="skeleton" style="height:220px"></div></div>`;
+  c.focus({ preventScroll: true });
+  window.scrollTo({ top: 0 });
   ({ dashboard: renderDashboard, register: renderRegister, trainees: renderTrainees,
-     reports: renderReports, deptTrainees: renderDeptTrainees }[view])?.();
+     reports: renderReports, deptTrainees: renderDeptTrainees, guide: renderGuide }[view])?.();
 }
 
 // القائمة الجانبية على الجوال
@@ -209,7 +254,7 @@ $("#sidebar-scrim").addEventListener("click", closeSidebar);
 function applyTheme(t) {
   document.documentElement.dataset.theme = t;
   localStorage.setItem("labTheme", t);
-  $("#theme-toggle").textContent = t === "dark" ? "☀️ الوضع الفاتح" : "🌙 الوضع الداكن";
+  $("#theme-toggle").innerHTML = t === "dark" ? `${ic("sun")}<span>الوضع الفاتح</span>` : `${ic("moon")}<span>الوضع الداكن</span>`;
 }
 $("#theme-toggle").addEventListener("click", () =>
   applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
@@ -217,17 +262,100 @@ applyTheme(localStorage.getItem("labTheme") || (matchMedia("(prefers-color-schem
 
 $("#logout-btn").addEventListener("click", () => { session.user = null; show("login-screen"); });
 
+// ─────────────── تغيير كلمة المرور ───────────────
+// كل حساب يغيّر كلمته بعد إدخال الكلمة الحالية؛ المسؤول يقدر يعيد تعيين كلمات الأقسام بدونها.
+$("#change-pass-btn").addEventListener("click", () => {
+  closeSidebar();
+  const me = session.user;
+  const isAdmin = me.role === "admin";
+  const accounts = isAdmin ? DEFAULT_USERS.map((u) => ({ id: u.username, label: u.label })) : [];
+  openModal(`
+    <div class="modal-head"><h3>${ic("key", 20)} تغيير كلمة المرور</h3>
+      <button class="icon-btn" id="cp-close" aria-label="إغلاق">${ic("close")}</button></div>
+    <form id="cp-form">
+      ${isAdmin ? `
+      <label class="field"><span>الحساب</span>
+        <select id="cp-user">${accounts.map((a) =>
+          `<option value="${esc(a.id)}"${a.id === me.username ? " selected" : ""}>${esc(a.label)}</option>`).join("")}</select>
+      </label>` : ""}
+      <label class="field" id="cp-current-wrap"><span>كلمة المرور الحالية</span>
+        <input type="password" id="cp-current" autocomplete="current-password" dir="ltr" /></label>
+      <label class="field"><span>كلمة المرور الجديدة</span>
+        <input type="password" id="cp-new" autocomplete="new-password" required minlength="6" dir="ltr" /></label>
+      <label class="field"><span>تأكيد كلمة المرور الجديدة</span>
+        <input type="password" id="cp-confirm" autocomplete="new-password" required minlength="6" dir="ltr" /></label>
+      <p class="form-hint">6 أحرف على الأقل.</p>
+      <p id="cp-error" class="form-error hidden"></p>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" id="cp-cancel">إلغاء</button>
+        <button type="submit" class="btn btn-primary" id="cp-save">${ic("save")} حفظ</button>
+      </div>
+    </form>`);
+
+  const target = () => (isAdmin ? $("#cp-user").value : me.username);
+  const isSelf = () => target() === me.username;
+  const syncCurrent = () => {
+    $("#cp-current-wrap").classList.toggle("hidden", !isSelf());
+    $("#cp-current").required = isSelf();
+  };
+  if (isAdmin) $("#cp-user").addEventListener("change", syncCurrent);
+  syncCurrent();
+
+  $("#cp-close").addEventListener("click", closeModal);
+  $("#cp-cancel").addEventListener("click", closeModal);
+
+  $("#cp-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = $("#cp-error");
+    const fail = (msg) => { errEl.textContent = msg; errEl.classList.remove("hidden"); };
+    errEl.classList.add("hidden");
+    const next = $("#cp-new").value;
+    if (next !== $("#cp-confirm").value) return fail("كلمتا المرور الجديدتان غير متطابقتين");
+    const btn = $("#cp-save");
+    btn.disabled = true;
+    try {
+      const username = target();
+      const self = isSelf();
+      const ref = doc(db, "users", username);
+      if (self) {
+        const snap = await getDoc(ref);
+        if (!snap.exists() || snap.data().passHash !== await sha256($("#cp-current").value))
+          return fail("كلمة المرور الحالية غير صحيحة");
+      }
+      await setDoc(ref, { passHash: await sha256(next) }, { merge: true });
+      closeModal();
+      toast(self ? "تم تغيير كلمة المرور" : "تم تغيير كلمة مرور الحساب");
+    } catch {
+      fail("تعذر حفظ كلمة المرور — تحقق من الاتصال");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+});
+
 // ─────────────── الدخول ───────────────
 
 // قائمة الحسابات: مسؤول التدريب + الأقسام السبعة
 $("#login-username").innerHTML =
-  `<option value="admin">👤 مسؤول التدريب</option>` +
-  DEPARTMENTS.map((d) => `<option value="${d.id}">🧪 قسم ${d.ar} — ${d.en}</option>`).join("");
+  `<option value="admin">مسؤول التدريب</option>` +
+  DEPARTMENTS.map((d) => `<option value="${d.id}">قسم ${d.ar} — ${d.en}</option>`).join("");
 
 $$(".tab").forEach((tab) => tab.addEventListener("click", () => {
   $$(".tab").forEach((t) => t.classList.toggle("active", t === tab));
   $$(".tab-panel").forEach((p) => p.classList.toggle("hidden", p.dataset.panel !== tab.dataset.tab));
 }));
+
+$("#toggle-password").addEventListener("click", (e) => {
+  const btn = e.currentTarget;
+  const input = $("#login-password");
+  const show = input.type === "password";
+  input.type = show ? "text" : "password";
+  btn.setAttribute("aria-pressed", String(show));
+  btn.setAttribute("aria-label", show ? "إخفاء كلمة المرور" : "إظهار كلمة المرور");
+  btn.querySelector(".eye-open").classList.toggle("hidden", show);
+  btn.querySelector(".eye-closed").classList.toggle("hidden", !show);
+  input.focus();
+});
 
 $("#login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -267,7 +395,7 @@ $("#trainee-lookup-form").addEventListener("submit", async (e) => {
     const t = { id: snap.docs[0].id, ...snap.docs[0].data() };
     $("#portal-content").innerHTML = `
       <div class="card animate-pop">
-        <h3 class="card-title">مرحبًا ${esc(t.name)} 👋</h3>
+        <h3 class="card-title">مرحبًا ${esc(t.name)}</h3>
         <p class="card-sub">فترة التدريب: ${fmtDate(t.startDate)} — ${fmtDate(traineeEndISO(t))} (${durationLabel(t.months)})</p>
         ${scheduleTimelineHTML(t)}
       </div>`;
@@ -333,6 +461,7 @@ async function renderDashboard() {
   const periodBtns = [[1, "شهر"], [2, "شهران"], [3, "3 أشهر"], [6, "6 أشهر"], [0, "الكل"]]
     .map(([v, l]) => `<button data-p="${v}" class="${dashPeriod === v ? "on" : ""}">${l}</button>`).join("");
 
+  if (currentView !== "dashboard") return; // تجاهل النتيجة إذا انتقل المستخدم لشاشة أخرى
   $("#content").innerHTML = `
     <div class="view">
       <div class="card-head" style="margin-bottom:16px">
@@ -344,19 +473,19 @@ async function renderDashboard() {
       </div>
 
       <div class="grid grid-stats stagger">
-        <div class="card stat-tile"><div class="stat-icon">👥</div>
+        <div class="card stat-tile"><div class="stat-icon">${ic("users", 20)}</div>
           <div class="stat-label">متدربو الفترة</div>
           <div class="stat-value" data-count="${list.length}">0</div>
           <div class="stat-foot">إجمالي السجل: ${trainees.length}</div></div>
-        <div class="card stat-tile"><div class="stat-icon">🟢</div>
+        <div class="card stat-tile"><div class="stat-icon green">${ic("activity", 20)}</div>
           <div class="stat-label">على رأس التدريب الآن</div>
           <div class="stat-value" data-count="${active.length}">0</div>
           <div class="stat-foot">حتى ${fmtDate(today)}</div></div>
-        <div class="card stat-tile"><div class="stat-icon">🎓</div>
+        <div class="card stat-tile"><div class="stat-icon amber">${ic("graduation", 20)}</div>
           <div class="stat-label">أكملوا التدريب</div>
           <div class="stat-value" data-count="${finished.length}">0</div>
           <div class="stat-foot">ضمن الفترة المحددة</div></div>
-        <div class="card stat-tile"><div class="stat-icon">📝</div>
+        <div class="card stat-tile"><div class="stat-icon violet">${ic("pen", 20)}</div>
           <div class="stat-label">تقييمات مسجلة</div>
           <div class="stat-value" data-count="${evals.length}">0</div>
           <div class="stat-foot">من جميع الأقسام</div></div>
@@ -426,7 +555,7 @@ function renderRegister() {
         <div class="field">
           <span>الأقسام</span>
           <div class="dept-picker" id="reg-depts">
-            <button type="button" class="dept-chip all on" data-all>✔ كل الأقسام</button>
+            <button type="button" class="dept-chip all on" data-all>${ic("check", 15)} كل الأقسام</button>
             ${DEPARTMENTS.map((d) => `<button type="button" class="dept-chip on" data-dept="${d.id}">${d.ar} · ${d.en}</button>`).join("")}
           </div>
           <p class="form-hint">اختر «كل الأقسام» أو انقر الأقسام المطلوبة فقط — الترتيب حسب تسلسل الأقسام</p>
@@ -435,7 +564,7 @@ function renderRegister() {
         <div class="card" style="background:var(--surface-2); box-shadow:none" id="schedule-preview"></div>
 
         <div class="modal-foot" style="justify-content:flex-start">
-          <button type="submit" class="btn btn-primary" id="reg-submit">💾 حفظ وتوليد الجدول</button>
+          <button type="submit" class="btn btn-primary" id="reg-submit">${ic("save")} حفظ وتوليد الجدول</button>
         </div>
       </form>
     </div>`;
@@ -506,15 +635,16 @@ function renderRegister() {
 async function renderTrainees() {
   const trainees = await fetchTrainees();
 
+  if (currentView !== "trainees") return; // تجاهل النتيجة إذا انتقل المستخدم لشاشة أخرى
   $("#content").innerHTML = `
     <div class="view card">
       <div class="card-head">
         <div><h3 class="card-title">سجل المتدربين</h3>
           <p class="card-sub" style="margin:0">البحث بالاسم أو رقم الهوية أو فترة التدريب</p></div>
-        <button class="btn btn-primary btn-sm" id="go-register">➕ متدرب جديد</button>
+        <button class="btn btn-primary btn-sm" id="go-register">${ic("plus", 16)} متدرب جديد</button>
       </div>
       <div class="search-bar">
-        <label class="field"><input id="q-text" placeholder="🔍 بحث بالاسم أو رقم الهوية…" /></label>
+        <label class="field"><input id="q-text" placeholder="بحث بالاسم أو رقم الهوية…" aria-label="بحث بالاسم أو رقم الهوية" /></label>
         <label class="field" style="flex:0 0 auto"><input id="q-from" type="date" title="تدريب يتقاطع مع الفترة من" /></label>
         <label class="field" style="flex:0 0 auto"><input id="q-to" type="date" title="إلى" /></label>
         <button class="btn btn-ghost btn-sm" id="q-clear">مسح</button>
@@ -536,7 +666,7 @@ async function renderTrainees() {
     });
     const today = todayISO();
     $("#trainee-table").innerHTML = !list.length
-      ? `<div class="empty-state"><div class="big">🔍</div>لا توجد نتائج مطابقة</div>`
+      ? `<div class="empty-state"><div class="big">${ic("search", 34)}</div>لا توجد نتائج مطابقة</div>`
       : `<div class="table-wrap"><table class="tbl">
           <thead><tr><th>المتدرب</th><th>رقم الهوية</th><th>الفترة</th><th>المدة</th><th>الأقسام</th><th>الحالة</th><th></th></tr></thead>
           <tbody>${list.map((t) => {
@@ -552,10 +682,10 @@ async function renderTrainees() {
               <td><span class="badge badge-blue">${t.deptIds.length === DEPARTMENTS.length ? "كل الأقسام" : `${t.deptIds.length} أقسام`}</span></td>
               <td>${status}</td>
               <td><div class="row-actions">
-                <button class="btn btn-outline btn-sm" data-act="view" data-id="${t.id}">👁 التفاصيل</button>
-                <button class="btn btn-outline btn-sm" data-act="edit" data-id="${t.id}">✏️ تعديل</button>
-                <button class="btn btn-outline btn-sm" data-act="sheet" data-id="${t.id}">🖨 Time Sheet</button>
-                <button class="btn btn-ghost btn-sm danger" data-act="del" data-id="${t.id}">🗑</button>
+                <button class="btn btn-outline btn-sm" data-act="view" data-id="${t.id}">${ic("eye", 15)} التفاصيل</button>
+                <button class="btn btn-outline btn-sm" data-act="edit" data-id="${t.id}">${ic("edit", 15)} تعديل</button>
+                <button class="btn btn-outline btn-sm" data-act="sheet" data-id="${t.id}">${ic("printer", 15)} Time Sheet</button>
+                <button class="btn btn-ghost btn-sm danger" data-act="del" data-id="${t.id}" aria-label="حذف المتدرب" title="حذف">${ic("trash", 16)}</button>
               </div></td></tr>`;
           }).join("")}</tbody></table></div>`;
 
@@ -598,8 +728,8 @@ function openEditModal(t, trainees) {
   const customMonths = selMonths === "custom" ? t.months : 1;
 
   openModal(`
-    <div class="modal-head"><h3>✏️ تعديل بيانات المتدرب</h3>
-      <button class="icon-btn" id="ed-close">✕</button></div>
+    <div class="modal-head"><h3>${ic("edit", 20)} تعديل بيانات المتدرب</h3>
+      <button class="icon-btn" id="ed-close" aria-label="إغلاق">${ic("close")}</button></div>
     <form id="edit-form">
       <div class="field-row">
         <label class="field"><span>اسم المتدرب</span>
@@ -622,7 +752,7 @@ function openEditModal(t, trainees) {
       <div class="field">
         <span>الأقسام</span>
         <div class="dept-picker" id="ed-depts">
-          <button type="button" class="dept-chip ${t.deptIds.length === DEPARTMENTS.length ? "on" : ""} all" data-all>✔ كل الأقسام</button>
+          <button type="button" class="dept-chip ${t.deptIds.length === DEPARTMENTS.length ? "on" : ""} all" data-all>${ic("check", 15)} كل الأقسام</button>
           ${DEPARTMENTS.map((d) => `<button type="button" class="dept-chip ${t.deptIds.includes(d.id) ? "on" : ""}" data-dept="${d.id}">${d.ar} · ${d.en}</button>`).join("")}
         </div>
       </div>
@@ -632,7 +762,7 @@ function openEditModal(t, trainees) {
       <p id="ed-error" class="form-error hidden"></p>
       <div class="modal-foot">
         <button type="button" class="btn btn-ghost" id="ed-cancel">إلغاء</button>
-        <button type="submit" class="btn btn-primary" id="ed-save">💾 حفظ التعديلات</button>
+        <button type="submit" class="btn btn-primary" id="ed-save">${ic("save")} حفظ التعديلات</button>
       </div>
     </form>`);
 
@@ -706,8 +836,8 @@ async function openTraineeModal(t) {
   const evals = await fetchEvaluations({ traineeId: t.id });
   const evaluatedDepts = new Set(evals.map((e) => e.dept));
   openModal(`
-    <div class="modal-head"><h3>👤 ${esc(t.name)}</h3>
-      <button class="icon-btn" id="tm-close">✕</button></div>
+    <div class="modal-head"><h3>${ic("user", 20)} ${esc(t.name)}</h3>
+      <button class="icon-btn" id="tm-close" aria-label="إغلاق">${ic("close")}</button></div>
     <p class="card-sub">
       رقم الهوية: <b class="num">${esc(t.nationalId)}</b> ·
       المدة: <b>${durationLabel(t.months)}</b> ·
@@ -720,8 +850,8 @@ async function openTraineeModal(t) {
       ${t.deptIds.map((d) => `<span class="badge ${evaluatedDepts.has(d) ? "badge-green" : "badge-gray"}">${deptById(d).ar} ${evaluatedDepts.has(d) ? "✓" : "—"}</span>`).join("")}
     </div>
     <div class="modal-foot">
-      <button class="btn btn-outline" id="tm-sheet">🖨 طباعة Time Sheet</button>
-      <button class="btn btn-primary" id="tm-report" ${evals.length ? "" : "disabled"}>📄 التقرير النهائي</button>
+      <button class="btn btn-outline" id="tm-sheet">${ic("printer")} طباعة Time Sheet</button>
+      <button class="btn btn-primary" id="tm-report" ${evals.length ? "" : "disabled"}>${ic("file")} التقرير النهائي</button>
     </div>`);
   $("#tm-close").addEventListener("click", closeModal);
   $("#tm-sheet").addEventListener("click", () => printTimesheet(t));
@@ -735,6 +865,7 @@ async function renderReports() {
   const byTrainee = {};
   evals.forEach((e) => { (byTrainee[e.traineeId] ||= []).push(e); });
 
+  if (currentView !== "reports") return; // تجاهل النتيجة إذا انتقل المستخدم لشاشة أخرى
   $("#content").innerHTML = `
     <div class="view card">
       <div class="card-head">
@@ -742,7 +873,7 @@ async function renderReports() {
           <p class="card-sub" style="margin:0">ابحث باسم المتدرب أو صفِّ حسب القسم، ثم صدّر التقرير النهائي</p></div>
       </div>
       <div class="search-bar">
-        <label class="field"><input id="r-text" placeholder="🔍 بحث باسم المتدرب…" /></label>
+        <label class="field"><input id="r-text" placeholder="بحث باسم المتدرب…" aria-label="بحث باسم المتدرب" /></label>
         <label class="field" style="flex:0 0 auto">
           <select id="r-dept">
             <option value="">كل الأقسام</option>
@@ -762,7 +893,7 @@ async function renderReports() {
       return matchTxt && matchDept;
     });
     $("#report-table").innerHTML = !list.length
-      ? `<div class="empty-state"><div class="big">📋</div>لا توجد نتائج</div>`
+      ? `<div class="empty-state"><div class="big">${ic("clipboard", 34)}</div>لا توجد نتائج</div>`
       : `<div class="table-wrap"><table class="tbl">
           <thead><tr><th>المتدرب</th><th>الأقسام المُقيِّمة</th><th>التقدم</th><th></th></tr></thead>
           <tbody>${list.map((t) => {
@@ -777,7 +908,7 @@ async function renderReports() {
               <td><span class="badge ${done === total ? "badge-green" : done ? "badge-amber" : "badge-gray"}">${done} / ${total}</span></td>
               <td><div class="row-actions">
                 <button class="btn btn-outline btn-sm" data-view="${t.id}">عرض التقييمات</button>
-                <button class="btn btn-primary btn-sm" data-print="${t.id}" ${done ? "" : "disabled"}>📄 تصدير التقرير</button>
+                <button class="btn btn-primary btn-sm" data-print="${t.id}" ${done ? "" : "disabled"}>${ic("file", 15)} تصدير التقرير</button>
               </div></td></tr>`;
           }).join("")}</tbody></table></div>`;
 
@@ -809,17 +940,116 @@ function evalMatrixHTML(t, evals) {
 
 function openEvaluationsModal(t, evals) {
   openModal(`
-    <div class="modal-head"><h3>📋 تقييمات ${esc(t.name)}</h3>
-      <button class="icon-btn" id="em-close">✕</button></div>
-    ${evals.length ? evalMatrixHTML(t, evals) : `<div class="empty-state"><div class="big">📝</div>لم يسجَّل أي تقييم بعد</div>`}
+    <div class="modal-head"><h3>${ic("clipboard", 20)} تقييمات ${esc(t.name)}</h3>
+      <button class="icon-btn" id="em-close" aria-label="إغلاق">${ic("close")}</button></div>
+    ${evals.length ? evalMatrixHTML(t, evals) : `<div class="empty-state"><div class="big">${ic("pen", 34)}</div>لم يسجَّل أي تقييم بعد</div>`}
     <div class="modal-foot">
-      <button class="btn btn-primary" id="em-print" ${evals.length ? "" : "disabled"}>📄 تصدير التقرير النهائي</button>
+      <button class="btn btn-primary" id="em-print" ${evals.length ? "" : "disabled"}>${ic("file")} تصدير التقرير النهائي</button>
     </div>`);
   $("#em-close").addEventListener("click", closeModal);
   $("#em-print").addEventListener("click", () => printFinalReport(t, evals));
 }
 
 // ═══════════════ واجهة القسم ═══════════════
+
+// ─────────────── دليل المستخدم ───────────────
+
+function renderGuide() {
+  const isAdmin = session.user.role === "admin";
+  const step = (items) => `<ol class="guide-steps">${items.map((i) => `<li>${i}</li>`).join("")}</ol>`;
+  const go_ = (view, label) => `<button type="button" class="btn btn-outline btn-sm" data-goto="${view}">${label} ${ic("arrowRight", 14)}</button>`;
+
+  const sections = isAdmin ? [
+    { icon: "dashboard", title: "لوحة المعلومات", body: `
+      <p>نظرة سريعة على أعداد المتدربين: متدربو الفترة، المتدربون على رأس التدريب الآن، من أكملوا التدريب، وعدد التقييمات المسجلة.</p>
+      ${step(["اختر الفترة من الأزرار أعلى اللوحة (شهر، شهران، 3 أشهر، 6 أشهر، الكل).", "تتحدث البطاقات والمخططات حسب الفترة المختارة."])}
+      ${go_("dashboard", "افتح لوحة المعلومات")}` },
+    { icon: "userPlus", title: "تسجيل متدرب جديد", body: `
+      ${step([
+        "أدخل اسم المتدرب ورقم الهوية (لا يتكرر رقم الهوية بين متدربين).",
+        "اختر تاريخ بداية التدريب ومدته، أو «مدة أخرى…» لتحديد عدد الأشهر يدويًا.",
+        "اختر الأقسام التي سيتدرب فيها، أو «كل الأقسام».",
+        "راجع معاينة الجدول، ثم اضغط <b>حفظ وتوليد الجدول</b>.",
+      ])}
+      <p class="guide-note">${ic("lightbulb", 16)} يوزّع النظام مدة التدريب بالتساوي على الأقسام المختارة بالترتيب، وأيام الدوام من الأحد إلى الخميس.</p>
+      ${go_("register", "سجّل متدربًا")}` },
+    { icon: "users", title: "المتدربون والبحث", body: `
+      <p>ابحث بالاسم أو رقم الهوية، أو حدّد نطاق تاريخ. لكل متدرب الأزرار التالية:</p>
+      <ul class="guide-list">
+        <li><b>التفاصيل:</b> الجدول التدريبي وحالة التقييم في كل قسم.</li>
+        <li><b>تعديل:</b> تغيير البيانات أو المدة أو الأقسام، ويُعاد توليد الجدول تلقائيًا.</li>
+        <li><b>Time Sheet:</b> طباعة كشف الحضور الشهري، أو حفظه PDF من نافذة الطباعة.</li>
+        <li><b>حذف:</b> يطلب تأكيدًا قبل الحذف.</li>
+      </ul>
+      ${go_("trainees", "افتح قائمة المتدربين")}` },
+    { icon: "clipboard", title: "التقييمات والتقرير النهائي", body: `
+      <p>يتابع العمود «التقدم» عدد الأقسام التي قيّمت المتدرب من إجمالي أقسامه.</p>
+      ${step(["اضغط <b>عرض التقييمات</b> لرؤية تقييم كل قسم وملاحظاته.", "اضغط <b>تصدير التقرير</b> لطباعة التقرير النهائي أو حفظه PDF (يتفعّل بعد أول تقييم)."])}
+      ${go_("reports", "افتح التقييمات")}` },
+    { icon: "key", title: "كلمات المرور والحسابات", body: `
+      <p>من زر <b>تغيير كلمة المرور</b> أسفل القائمة الجانبية:</p>
+      <ul class="guide-list">
+        <li>لحسابك: أدخل كلمتك الحالية ثم الجديدة مرتين.</li>
+        <li>لحساب قسم: اختره من القائمة واكتب كلمة جديدة بدون الحاجة لكلمته الحالية.</li>
+      </ul>
+      <p class="guide-note">${ic("lightbulb", 16)} غيّر كلمات المرور الافتراضية لكل الحسابات بعد أول دخول.</p>` },
+    { icon: "search", title: "استعلام المتدرب", body: `
+      <p>يستطيع المتدرب معرفة جدوله بدون حساب: من شاشة الدخول يختار تبويب <b>استعلام المتدرب</b> ويكتب رقم هويته.</p>` },
+  ] : [
+    { icon: "users", title: "متدربو القسم", body: `
+      <p>تظهر هنا قائمة المتدربين المجدولين في قسمك مع فترة تدريب كل واحد وحالة تقييمه: <span class="badge badge-red">بانتظار التقييم</span> أو <span class="badge badge-green">مُقيَّم ✓</span>.</p>
+      ${go_("deptTrainees", "افتح متدربي القسم")}` },
+    { icon: "pen", title: "تقييم متدرب", body: `
+      ${step([
+        "اضغط <b>تقييم</b> بجانب اسم المتدرب.",
+        "اختر تقديرًا لكل معيار من المعايير.",
+        "أضف ملاحظات إن وجدت (اختياري).",
+        "اضغط <b>حفظ التقييم</b>. تقدر تعدّله لاحقًا من زر <b>تعديل التقييم</b>.",
+      ])}` },
+    { icon: "key", title: "تغيير كلمة المرور", body: `
+      <p>من زر <b>تغيير كلمة المرور</b> أسفل القائمة الجانبية: أدخل كلمتك الحالية ثم الجديدة مرتين. إذا نسيت كلمتك، اطلب من مسؤول التدريب إعادة تعيينها.</p>` },
+  ];
+
+  const scale = `
+    <div class="guide-scale">
+      <div><h4>معايير التقييم</h4><ul class="guide-list">${CRITERIA.map((c) => `<li>${c.ar} <small class="muted">${c.en}</small></li>`).join("")}</ul></div>
+      <div><h4>التقديرات</h4><div class="dept-picker">${RATINGS.map((r) => `<span class="badge badge-blue">${r.ar} · ${r.en}</span>`).join("")}</div></div>
+    </div>`;
+
+  $("#content").innerHTML = `
+    <div class="view">
+      <div class="card guide-hero">
+        <div class="guide-hero-icon">${ic("book", 26)}</div>
+        <div>
+          <h3 class="card-title">دليل المستخدم</h3>
+          <p class="card-sub">${isAdmin ? "كل ما يحتاجه مسؤول التدريب لإدارة المتدربين والجداول والتقارير." : "خطوات متابعة متدربي قسمك وتسجيل تقييماتهم."}</p>
+        </div>
+      </div>
+      <div class="guide-list-wrap stagger">
+        ${sections.map((s, i) => `
+          <details class="card guide-item" ${i === 0 ? "open" : ""}>
+            <summary><span class="guide-ic">${ic(s.icon, 19)}</span><span class="guide-title">${s.title}</span><span class="guide-chev">${ic("chevron", 18)}</span></summary>
+            <div class="guide-body">${s.body}</div>
+          </details>`).join("")}
+        <details class="card guide-item">
+          <summary><span class="guide-ic">${ic("checkCircle", 19)}</span><span class="guide-title">معايير التقييم والتقديرات</span><span class="guide-chev">${ic("chevron", 18)}</span></summary>
+          <div class="guide-body">${scale}</div>
+        </details>
+        <details class="card guide-item">
+          <summary><span class="guide-ic">${ic("moon", 19)}</span><span class="guide-title">المظهر والجوال</span><span class="guide-chev">${ic("chevron", 18)}</span></summary>
+          <div class="guide-body">
+            <ul class="guide-list">
+              <li>بدّل بين الوضع الفاتح والداكن من أسفل القائمة الجانبية، ويتذكر الموقع اختيارك.</li>
+              <li>على الجوال افتح القائمة من زر ${ic("menu", 15)} أعلى الشاشة.</li>
+              <li>لحفظ أي تقرير PDF: اضغط زر الطباعة واختر <b>Save as PDF</b>.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>`;
+
+  $$("#content [data-goto]").forEach((b) => b.addEventListener("click", () => go(b.dataset.goto)));
+}
 
 async function renderDeptTrainees() {
   const me = session.user;
@@ -828,6 +1058,7 @@ async function renderDeptTrainees() {
   const evals = await fetchEvaluations({ dept: me.dept });
   const today = todayISO();
 
+  if (currentView !== "deptTrainees") return; // تجاهل النتيجة إذا انتقل المستخدم لشاشة أخرى
   $("#content").innerHTML = `
     <div class="view card">
       <div class="card-head">
@@ -835,7 +1066,7 @@ async function renderDeptTrainees() {
           <p class="card-sub" style="margin:0">قيّم كل متدرب مرّ على القسم — يمكن تعديل التقييم لاحقًا</p></div>
       </div>
       <div class="search-bar">
-        <label class="field"><input id="d-text" placeholder="🔍 بحث بالاسم أو رقم الهوية…" /></label>
+        <label class="field"><input id="d-text" placeholder="بحث بالاسم أو رقم الهوية…" aria-label="بحث بالاسم أو رقم الهوية" /></label>
       </div>
       <div id="dept-table"></div>
     </div>`;
@@ -844,7 +1075,7 @@ async function renderDeptTrainees() {
     const txt = $("#d-text").value.trim().toLowerCase();
     const list = trainees.filter((t) => !txt || t.name.toLowerCase().includes(txt) || t.nationalId.includes(txt));
     $("#dept-table").innerHTML = !list.length
-      ? `<div class="empty-state"><div class="big">👥</div>لا يوجد متدربون مجدولون في هذا القسم</div>`
+      ? `<div class="empty-state"><div class="big">${ic("users", 34)}</div>لا يوجد متدربون مجدولون في هذا القسم</div>`
       : `<div class="table-wrap"><table class="tbl">
           <thead><tr><th>المتدرب</th><th>رقم الهوية</th><th>فترته في القسم</th><th>الحالة</th><th>التقييم</th><th></th></tr></thead>
           <tbody>${list.map((t) => {
@@ -859,7 +1090,7 @@ async function renderDeptTrainees() {
               <td class="num">${seg ? `${fmtDate(seg.from)} — ${fmtDate(seg.to)}` : "—"}</td>
               <td>${status}</td>
               <td>${ev ? `<span class="badge badge-green">مُقيَّم ✓</span>` : `<span class="badge badge-red">بانتظار التقييم</span>`}</td>
-              <td><button class="btn ${ev ? "btn-outline" : "btn-primary"} btn-sm" data-ev="${t.id}">${ev ? "✏️ تعديل التقييم" : "📝 تقييم"}</button></td>
+              <td><button class="btn ${ev ? "btn-outline" : "btn-primary"} btn-sm" data-ev="${t.id}">${ev ? `${ic("edit", 15)} تعديل التقييم` : `${ic("pen", 15)} تقييم`}</button></td>
             </tr>`;
           }).join("")}</tbody></table></div>`;
 
@@ -876,8 +1107,8 @@ function openEvaluationForm(t, existing) {
   const me = session.user;
   const d = deptById(me.dept);
   openModal(`
-    <div class="modal-head"><h3>📝 تقييم: ${esc(t.name)}</h3>
-      <button class="icon-btn" id="ev-close">✕</button></div>
+    <div class="modal-head"><h3>${ic("pen", 20)} تقييم: ${esc(t.name)}</h3>
+      <button class="icon-btn" id="ev-close" aria-label="إغلاق">${ic("close")}</button></div>
     <p class="card-sub">قسم ${d.ar} — ${d.en} · اختر درجة لكل معيار</p>
     <div class="rate-grid">
       ${CRITERIA.map((c) => `
@@ -895,7 +1126,7 @@ function openEvaluationForm(t, existing) {
     <p id="ev-error" class="form-error hidden"></p>
     <div class="modal-foot">
       <button class="btn btn-ghost" id="ev-cancel">إلغاء</button>
-      <button class="btn btn-primary" id="ev-save">💾 حفظ التقييم</button>
+      <button class="btn btn-primary" id="ev-save">${ic("save")} حفظ التقييم</button>
     </div>`);
 
   $$(".rate-row").forEach((row) =>
