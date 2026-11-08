@@ -49,6 +49,23 @@ const RATINGS = [
 ];
 const ratingById = (id) => RATINGS.find((r) => r.id === id);
 
+// درجة رقمية لكل تقدير (1–4) لحساب المعدل فقط — البيانات المحفوظة تبقى بالتقديرات نفسها
+const RATING_SCORE = { FAIR: 1, GOOD: 2, VGOOD: 3, EXCELLENT: 4 };
+const MAX_SCORE = RATINGS.length;
+// معدل تقييم واحد (متوسط درجات معاييره) أو null
+const evalAvg = (ev) => {
+  const v = Object.values(ev?.scores || {}).map((r) => RATING_SCORE[r]).filter(Boolean);
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+};
+// متوسط مجموعة تقييمات
+const avgOf = (evals) => {
+  const v = evals.map(evalAvg).filter((x) => x != null);
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+};
+// أقرب تقدير لمعدل رقمي
+const ratingForAvg = (a) => a == null ? null : RATINGS[Math.min(MAX_SCORE, Math.max(1, Math.round(a))) - 1];
+const fmtAvg = (a) => a == null ? "—" : a.toFixed(1);
+
 const DURATIONS = [
   { months: 2,  label: "شهران" },
   { months: 3,  label: "3 أشهر" },
@@ -77,8 +94,6 @@ const ICON_PATHS = {
   clipboard: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
   book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
   key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
-  moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
-  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
   logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
   close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
   save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
@@ -102,6 +117,10 @@ const ICON_PATHS = {
   calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
   lightbulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/>',
   chevron: '<polyline points="6 9 12 15 18 9"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  hourglass: '<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.17a2 2 0 0 0-.59-1.42L12 12l-4.41 4.41A2 2 0 0 0 7 17.83V22"/><path d="M7 2v4.17a2 2 0 0 0 .59 1.42L12 12l4.41-4.41A2 2 0 0 0 17 6.17V2"/>',
+  listChecks: '<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>',
+  chart: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
 };
 const ic = (name, size = 18) =>
   `<svg class="ic" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name] || ""}</svg>`;
@@ -191,17 +210,31 @@ function show(screen) {
 
 const NAV = {
   admin: [
-    { id: "dashboard",  icon: "dashboard", label: "لوحة المعلومات" },
-    { id: "register",   icon: "userPlus", label: "تسجيل متدرب" },
-    { id: "trainees",   icon: "users", label: "المتدربون والبحث" },
-    { id: "reports",    icon: "clipboard", label: "التقييمات والتقارير" },
-    { id: "guide",      icon: "book", label: "دليل المستخدم" },
+    { id: "dashboard", icon: "dashboard",  label: "لوحة المعلومات" },
+    { id: "trainees",  icon: "users",      label: "المتدربون" },
+    { id: "register",  icon: "userPlus",   label: "تسجيل متدرب" },
+    { id: "reports",   icon: "clipboard",  label: "التقارير" },
+    { id: "criteria",  icon: "listChecks", label: "معايير التقييم" },
+    { id: "guide",     icon: "book",       label: "دليل المستخدم" },
   ],
   dept: [
-    { id: "deptTrainees", icon: "users", label: "متدربو القسم" },
-    { id: "guide",        icon: "book",  label: "دليل المستخدم" },
+    { id: "dashboard",    icon: "dashboard",  label: "لوحة المعلومات" },
+    { id: "deptTrainees", icon: "users",      label: "المتدربون" },
+    { id: "newEval",      icon: "pen",        label: "تقييم جديد" },
+    { id: "criteria",     icon: "listChecks", label: "معايير التقييم" },
+    { id: "guide",        icon: "book",       label: "دليل المستخدم" },
   ],
 };
+
+// زر الترويسة الرئيسي: القسم يبدأ تقييمًا جديدًا، والمسؤول يسجّل متدربًا
+const HEADER_ACTION = {
+  admin: { view: "register", icon: "userPlus", label: "متدرب جديد" },
+  dept:  { view: "newEval",  icon: "pen",      label: "تقييم جديد" },
+};
+
+// البحث في الترويسة: كل شاشة فيها جدول تسجّل دالة تصفية
+let searchHandler = null;
+const searchQ = () => ($("#top-search")?.value || "").trim().toLowerCase();
 
 let currentView = null;
 
@@ -221,44 +254,47 @@ function buildShell() {
     b.addEventListener("click", () => { go(item.id); closeSidebar(); });
     nav.appendChild(b);
   });
+  const act = HEADER_ACTION[u.role];
+  $("#header-action").innerHTML = `${ic(act.icon, 18)}<span>${act.label}</span>`;
+  $("#header-action").onclick = () => go(act.view);
   show("app-shell");
   go(NAV[u.role][0].id);
 }
 
-function go(view) {
+function go(view, { keepSearch = false } = {}) {
   currentView = view;
+  searchHandler = null;
+  if (!keepSearch) $("#top-search").value = "";
   $$(".nav-item").forEach((b) => {
     b.classList.toggle("active", b.dataset.view === view);
     if (b.dataset.view === view) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
   const titles = {
     dashboard: "لوحة المعلومات", register: "تسجيل متدرب جديد",
-    trainees: "المتدربون والبحث", reports: "التقييمات والتقرير النهائي",
-    deptTrainees: "متدربو القسم", guide: "دليل المستخدم",
+    trainees: "المتدربون", reports: "التقييمات والتقرير النهائي",
+    deptTrainees: "متدربو القسم", newEval: "تقييم جديد",
+    criteria: "معايير التقييم", guide: "دليل المستخدم",
   };
   $("#topbar-title").textContent = titles[view] || "";
   const c = $("#content");
   c.innerHTML = `<div class="grid stagger"><div class="skeleton" style="height:90px"></div><div class="skeleton" style="height:220px"></div></div>`;
   c.focus({ preventScroll: true });
   window.scrollTo({ top: 0 });
-  ({ dashboard: renderDashboard, register: renderRegister, trainees: renderTrainees,
-     reports: renderReports, deptTrainees: renderDeptTrainees, guide: renderGuide }[view])?.();
+  ({ dashboard: renderDashboard, newEval: () => renderDashboard({ focusForm: true }),
+     register: renderRegister, trainees: renderTrainees, reports: renderReports,
+     deptTrainees: renderDeptTrainees, criteria: renderCriteria, guide: renderGuide }[view])?.();
 }
 
-// القائمة الجانبية على الجوال
-const closeSidebar = () => { $("#sidebar").classList.remove("open"); $("#sidebar-scrim").classList.add("hidden"); };
-$("#menu-btn").addEventListener("click", () => { $("#sidebar").classList.add("open"); $("#sidebar-scrim").classList.remove("hidden"); });
-$("#sidebar-scrim").addEventListener("click", closeSidebar);
+// على الجوال تتحول القائمة الجانبية لشريط أفقي ثابت، فلا حاجة لفتحها وإغلاقها
+const closeSidebar = () => {};
 
-// الوضع الداكن
-function applyTheme(t) {
-  document.documentElement.dataset.theme = t;
-  localStorage.setItem("labTheme", t);
-  $("#theme-toggle").innerHTML = t === "dark" ? `${ic("sun")}<span>الوضع الفاتح</span>` : `${ic("moon")}<span>الوضع الداكن</span>`;
-}
-$("#theme-toggle").addEventListener("click", () =>
-  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
-applyTheme(localStorage.getItem("labTheme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+// البحث من الترويسة: يصفّي جدول الشاشة الحالية، أو ينقل لقائمة المتدربين إذا ما فيها جدول
+$("#top-search").addEventListener("input", () => {
+  if (searchHandler) return searchHandler();
+  const role = session.user?.role;
+  if (role) go(role === "admin" ? "trainees" : "deptTrainees", { keepSearch: true });
+});
+
 
 $("#logout-btn").addEventListener("click", () => { session.user = null; show("login-screen"); });
 
@@ -422,108 +458,254 @@ function scheduleTimelineHTML(t) {
 }
 
 // ═══════════════ لوحة المعلومات ═══════════════
+// للمسؤول: كل المتدربين + ملخص تقييمات المتدرب المختار
+// للقسم: متدربو القسم + نموذج تقييم مباشر للمتدرب المختار
 
-let dashPeriod = 3; // بالأشهر — 0 = الكل
+let dashPeriod = 3;        // فترة مخطط توزيع الأقسام بالأشهر — 0 = الكل
+let dashFilter = "all";    // all | active | done | pending
+let dashSelected = null;   // معرّف المتدرب المختار في الجدول
 
-async function renderDashboard() {
-  const trainees = await fetchTrainees();
-  const evals = await fetchEvaluations();
-  const today = todayISO();
+const STATUS = {
+  upcoming: { label: "لم يبدأ",          cls: "badge-gray" },
+  active:   { label: "جارٍ",             cls: "badge-blue" },
+  pending:  { label: "بانتظار التقييم",  cls: "badge-amber" },
+  done:     { label: "مكتمل",            cls: "badge-green" },
+};
 
-  const inPeriod = (t) => {
-    if (!dashPeriod) return true;
-    const from = toISO(addMonths(new Date(), -dashPeriod));
-    // كل متدرب تتقاطع فترة تدريبه مع الفترة المحددة
-    return traineeEndISO(t) >= from && t.startDate <= today;
-  };
-  const list = trainees.filter(inPeriod);
-  const active = trainees.filter((t) => t.startDate <= today && traineeEndISO(t) >= today);
-  const finished = list.filter((t) => traineeEndISO(t) < today);
-
-  // توزيع الأقسام
-  const deptCounts = Object.fromEntries(DEPARTMENTS.map((d) => [d.id, 0]));
-  list.forEach((t) => t.deptIds.forEach((d) => { if (d in deptCounts) deptCounts[d]++; }));
-  const maxDept = Math.max(1, ...Object.values(deptCounts));
-
-  // تسجيلات آخر 6 أشهر
-  const monthCols = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = addMonths(new Date(), -i);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    monthCols.push({ key, label: MONTH_AR[d.getMonth()], count: 0 });
+// صف المتدرب في الجدول: القسم، التقدم، التقييم، والحالة — حسب نوع الحساب
+function traineeRow(t, evals, me, today) {
+  const isAdmin = me.role === "admin";
+  const tEvals = evals.filter((e) => e.traineeId === t.id);
+  let from = t.startDate, to = traineeEndISO(t), deptLabel, evalDone;
+  if (isAdmin) {
+    const cur = t.schedule.find((s) => s.from <= today && s.to >= today);
+    deptLabel = cur ? deptById(cur.dept).ar
+      : today < t.startDate ? `يبدأ في ${deptById(t.deptIds[0]).ar}` : "أنهى التدريب";
+    evalDone = t.deptIds.length > 0 && t.deptIds.every((d) => tEvals.some((e) => e.dept === d));
+  } else {
+    const seg = t.schedule.find((s) => s.dept === me.dept);
+    if (seg) { from = seg.from; to = seg.to; }
+    deptLabel = deptById(me.dept).ar;
+    evalDone = tEvals.length > 0;
   }
-  trainees.forEach((t) => {
-    const m = monthCols.find((c) => t.startDate?.startsWith(c.key));
-    if (m) m.count++;
-  });
-  const maxMonth = Math.max(1, ...monthCols.map((c) => c.count));
+  const span = Math.max(1, parseISO(to) - parseISO(from) + 86400000);
+  const progress = today < from ? 0 : today > to ? 100
+    : Math.round(((parseISO(today) - parseISO(from) + 86400000) / span) * 100);
+  const status = evalDone ? "done" : today < from ? "upcoming" : today > to ? "pending" : "active";
+  return { t, tEvals, deptLabel, progress, avg: avgOf(tEvals), status, evalDone };
+}
 
-  const periodBtns = [[1, "شهر"], [2, "شهران"], [3, "3 أشهر"], [6, "6 أشهر"], [0, "الكل"]]
-    .map(([v, l]) => `<button data-p="${v}" class="${dashPeriod === v ? "on" : ""}">${l}</button>`).join("");
+async function renderDashboard({ focusForm = false } = {}) {
+  const me = session.user, isAdmin = me.role === "admin";
+  const viewId = currentView;
+  const [allTrainees, evals] = await Promise.all([
+    fetchTrainees(), fetchEvaluations(isAdmin ? null : { dept: me.dept }),
+  ]);
+  const trainees = isAdmin ? allTrainees : allTrainees.filter((t) => t.deptIds.includes(me.dept));
+  const today = todayISO();
+  const rows = trainees.map((t) => traineeRow(t, evals, me, today));
 
-  if (currentView !== "dashboard") return; // تجاهل النتيجة إذا انتقل المستخدم لشاشة أخرى
-  $("#content").innerHTML = `
-    <div class="view">
-      <div class="card-head" style="margin-bottom:16px">
-        <div>
-          <h3 class="card-title">نظرة عامة</h3>
-          <p class="card-sub" style="margin:0">المتدربون الذين تتقاطع فترتهم مع ${dashPeriod ? `آخر ${durationLabel(dashPeriod)}` : "كامل السجل"}</p>
-        </div>
-        <div class="seg" id="dash-period">${periodBtns}</div>
-      </div>
+  const avgAll = avgOf(evals);
+  const count = (st) => rows.filter((r) => r.status === st).length;
+  if (focusForm && !isAdmin) {
+    // «تقييم جديد»: أول متدرب لم يُقيَّم بعد، وإلا أول متدرب
+    dashSelected = (rows.find((r) => r.status === "pending") || rows.find((r) => !r.evalDone) || rows[0])?.t.id ?? null;
+  }
+  if (!rows.some((r) => r.t.id === dashSelected)) dashSelected = null;
 
-      <div class="grid grid-stats stagger">
-        <div class="card stat-tile"><div class="stat-icon">${ic("users", 20)}</div>
-          <div class="stat-label">متدربو الفترة</div>
-          <div class="stat-value" data-count="${list.length}">0</div>
-          <div class="stat-foot">إجمالي السجل: ${trainees.length}</div></div>
-        <div class="card stat-tile"><div class="stat-icon green">${ic("activity", 20)}</div>
-          <div class="stat-label">على رأس التدريب الآن</div>
-          <div class="stat-value" data-count="${active.length}">0</div>
-          <div class="stat-foot">حتى ${fmtDate(today)}</div></div>
-        <div class="card stat-tile"><div class="stat-icon amber">${ic("graduation", 20)}</div>
-          <div class="stat-label">أكملوا التدريب</div>
-          <div class="stat-value" data-count="${finished.length}">0</div>
-          <div class="stat-foot">ضمن الفترة المحددة</div></div>
-        <div class="card stat-tile"><div class="stat-icon violet">${ic("pen", 20)}</div>
-          <div class="stat-label">تقييمات مسجلة</div>
-          <div class="stat-value" data-count="${evals.length}">0</div>
-          <div class="stat-foot">من جميع الأقسام</div></div>
-      </div>
-
-      <div class="grid grid-2" style="margin-top:18px">
-        <div class="card">
-          <h3 class="card-title">توزيع المتدربين على الأقسام</h3>
-          <p class="card-sub">عدد متدربي الفترة المجدولين في كل قسم</p>
-          <div class="hbar-list">
-            ${DEPARTMENTS.map((d) => `
-              <div class="hbar" title="${d.ar}: ${deptCounts[d.id]} متدرب">
-                <div class="hbar-name">${d.ar}<small>${d.en}</small></div>
-                <div class="hbar-track"><div class="hbar-fill ${deptCounts[d.id] ? "" : "zero"}" style="width:${(deptCounts[d.id] / maxDept) * 100}%"></div></div>
-                <div class="hbar-val">${deptCounts[d.id]}</div>
-              </div>`).join("")}
-          </div>
-        </div>
-        <div class="card">
-          <h3 class="card-title">تسجيلات جديدة شهريًا</h3>
-          <p class="card-sub">عدد المتدربين الجدد في آخر 6 أشهر</p>
-          <div class="vbar-wrap">
-            ${monthCols.map((c) => `
-              <div class="vbar-col" title="${c.label}: ${c.count}">
-                <div class="vbar-num">${c.count}</div>
-                <div class="vbar" style="height:${(c.count / maxMonth) * 100}%"></div>
-              </div>`).join("")}
-          </div>
-          <div class="vbar-labels">${monthCols.map((c) => `<span>${c.label}</span>`).join("")}</div>
-        </div>
+  if (currentView !== viewId) return; // تجاهل النتيجة إذا انتقل المستخدم لشاشة أخرى
+  const kpi = (icon, tone, label, value, foot) => `
+    <div class="card stat-tile">
+      <div class="stat-icon ${tone}">${ic(icon, 22)}</div>
+      <div class="stat-body">
+        <div class="stat-label">${label}</div>
+        <div class="stat-value">${value}</div>
+        <div class="stat-foot">${foot}</div>
       </div>
     </div>`;
+  const avgRating = ratingForAvg(avgAll);
+  const filters = [["all", "الكل"], ["active", "جارٍ"], ["done", "مكتمل"], ["pending", "بانتظار التقييم"]];
 
-  $$("#dash-period button").forEach((b) => b.addEventListener("click", () => {
-    dashPeriod = Number(b.dataset.p);
-    renderDashboard();
+  $("#content").innerHTML = `
+    <div class="view">
+      <section class="grid grid-stats stagger" aria-label="المؤشرات">
+        ${kpi("users", "green", "إجمالي المتدربين", `<span data-count="${rows.length}">0</span>`, isAdmin ? "في السجل" : `في قسم ${deptById(me.dept).ar}`)}
+        ${kpi("star", "gold", "متوسط التقييم", `${fmtAvg(avgAll)}<small> من ${MAX_SCORE}</small>`, avgRating ? `تقدير ${avgRating.ar}` : "لا توجد تقييمات بعد")}
+        ${kpi("checkCircle", "green", "المكتمل", `<span data-count="${count("done")}">0</span>`, isAdmin ? "قيّمته كل أقسامه" : "قيّمه القسم")}
+        ${kpi("hourglass", "gold", "بانتظار التقييم", `<span data-count="${count("pending")}">0</span>`, "انتهت فترته ولم يُقيَّم")}
+      </section>
+
+      <div class="dash-grid">
+        <section class="card" aria-labelledby="dash-tbl-title">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" id="dash-tbl-title">${isAdmin ? "المتدربون" : "متدربو القسم"}</h3>
+              <p class="card-sub">اختر متدربًا من الجدول ${isAdmin ? "لعرض ملخص تقييماته" : "لتقييمه"}</p>
+            </div>
+            <div class="seg" id="dash-filter" role="group" aria-label="تصفية حسب الحالة">
+              ${filters.map(([v, l]) => `<button type="button" data-f="${v}" class="${dashFilter === v ? "on" : ""}" aria-pressed="${dashFilter === v}">${l}</button>`).join("")}
+            </div>
+          </div>
+          <div id="dash-table"></div>
+        </section>
+        <section class="card side-panel" id="dash-side" aria-live="polite"></section>
+      </div>
+
+      ${isAdmin ? `
+      <div class="grid grid-2 dash-charts">
+        <section class="card">
+          <div class="card-head">
+            <div><h3 class="card-title">توزيع المتدربين على الأقسام</h3>
+              <p class="card-sub">المتدربون الذين تتقاطع فترتهم مع ${dashPeriod ? `آخر ${durationLabel(dashPeriod)}` : "كامل السجل"}</p></div>
+            <div class="seg" id="dash-period">${[[1, "شهر"], [3, "3 أشهر"], [6, "6 أشهر"], [0, "الكل"]]
+              .map(([v, l]) => `<button type="button" data-p="${v}" class="${dashPeriod === v ? "on" : ""}" aria-pressed="${dashPeriod === v}">${l}</button>`).join("")}</div>
+          </div>
+          <div id="dash-dept-chart"></div>
+        </section>
+        <section class="card">
+          <h3 class="card-title">تسجيلات جديدة شهريًا</h3>
+          <p class="card-sub">عدد المتدربين الجدد في آخر 6 أشهر</p>
+          <div id="dash-month-chart"></div>
+        </section>
+      </div>` : ""}
+    </div>`;
+
+  $$("#content [data-count]").forEach((el) => animateCount(el, Number(el.dataset.count)));
+
+  // ── الجدول
+  const drawTable = () => {
+    const q = searchQ();
+    const list = rows.filter((r) =>
+      (dashFilter === "all" || r.status === dashFilter) &&
+      (!q || r.t.name.toLowerCase().includes(q) || r.t.nationalId.includes(q)));
+    $("#dash-table").innerHTML = !list.length
+      ? `<div class="empty-state"><div class="big">${ic("search", 30)}</div>لا يوجد متدربون مطابقون</div>`
+      : `<div class="table-wrap"><table class="tbl tbl-select">
+          <thead><tr><th>المتدرب</th><th>القسم</th><th>التقدم</th><th>التقييم</th><th>الحالة</th></tr></thead>
+          <tbody>${list.map((r) => `
+            <tr data-id="${r.t.id}" tabindex="0" class="${r.t.id === dashSelected ? "selected" : ""}" aria-selected="${r.t.id === dashSelected}">
+              <td><div class="person">
+                <span class="avatar-initial" aria-hidden="true">${esc(r.t.name.trim().charAt(0) || "؟")}</span>
+                <span><b>${esc(r.t.name)}</b><small class="num">${esc(r.t.nationalId)}</small></span>
+              </div></td>
+              <td>${esc(r.deptLabel)}</td>
+              <td><div class="progress" role="progressbar" aria-valuenow="${r.progress}" aria-valuemin="0" aria-valuemax="100" aria-label="تقدم التدريب">
+                <div class="progress-track"><div class="progress-fill" style="width:${r.progress}%"></div></div>
+                <span class="progress-val">${r.progress}%</span></div></td>
+              <td>${r.avg == null ? `<span class="muted">—</span>` : `<span class="score">${ic("star", 14)} ${fmtAvg(r.avg)}</span>`}</td>
+              <td><span class="badge ${STATUS[r.status].cls}">${STATUS[r.status].label}</span></td>
+            </tr>`).join("")}</tbody></table></div>`;
+    $$("#dash-table tr[data-id]").forEach((tr) => {
+      const pick = () => { dashSelected = tr.dataset.id; drawTable(); drawSide(); };
+      tr.addEventListener("click", pick);
+      tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    });
+  };
+
+  // ── العمود الجانبي
+  const drawSide = () => {
+    const side = $("#dash-side");
+    const r = rows.find((x) => x.t.id === dashSelected);
+    if (!r) {
+      side.innerHTML = `<div class="empty-state">
+        <div class="big">${ic(isAdmin ? "clipboard" : "pen", 30)}</div>
+        <b>${isAdmin ? "ملخص التقييم" : "نموذج التقييم"}</b><br>اختر متدربًا من الجدول</div>`;
+      return;
+    }
+    if (isAdmin) {
+      const t = r.t;
+      side.innerHTML = `
+        <div class="side-head">
+          <span class="avatar-initial lg" aria-hidden="true">${esc(t.name.trim().charAt(0))}</span>
+          <div><h3 class="card-title">${esc(t.name)}</h3>
+            <p class="card-sub">${fmtDate(t.startDate)} — ${fmtDate(traineeEndISO(t))} · ${durationLabel(t.months)}</p></div>
+        </div>
+        <div class="avg-box">
+          <span>المعدل العام</span>
+          <b>${fmtAvg(r.avg)}<small> من ${MAX_SCORE}</small></b>
+          <span class="badge ${r.avg == null ? "badge-gray" : "badge-gold"}">${ratingForAvg(r.avg)?.ar || "لم يُقيَّم"}</span>
+        </div>
+        <ul class="dept-scores">
+          ${t.deptIds.map((d) => {
+            const ev = r.tEvals.find((e) => e.dept === d), a = evalAvg(ev);
+            return `<li><span>${deptById(d).ar} <small>${deptById(d).en}</small></span>
+              ${ev ? `<span class="score">${ic("star", 14)} ${fmtAvg(a)}</span>` : `<span class="badge badge-gray">لم يُقيَّم</span>`}</li>`;
+          }).join("")}
+        </ul>
+        <div class="side-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="ds-view">${ic("eye", 15)} التفاصيل</button>
+          <button type="button" class="btn btn-outline btn-sm" id="ds-evals" ${r.tEvals.length ? "" : "disabled"}>${ic("clipboard", 15)} كل التقييمات</button>
+          <button type="button" class="btn btn-primary btn-sm" id="ds-print" ${r.tEvals.length ? "" : "disabled"}>${ic("file", 15)} التقرير النهائي</button>
+        </div>`;
+      $("#ds-view").addEventListener("click", () => openTraineeModal(t));
+      $("#ds-evals").addEventListener("click", () => openEvaluationsModal(t, r.tEvals));
+      $("#ds-print").addEventListener("click", () => printFinalReport(t, r.tEvals));
+    } else {
+      const existing = r.tEvals[0];
+      side.innerHTML = `
+        <div class="side-head">
+          <span class="avatar-initial lg" aria-hidden="true">${esc(r.t.name.trim().charAt(0))}</span>
+          <div><h3 class="card-title">تقييم: ${esc(r.t.name)}</h3>
+            <p class="card-sub">قسم ${deptById(me.dept).ar} · ${existing ? "تعديل تقييم محفوظ" : "تقييم جديد"}</p></div>
+        </div>
+        ${evalFormHTML(existing)}`;
+      bindEvalForm(side, r.t, existing, () => renderDashboard());
+    }
+  };
+
+  // ── المخططات (للمسؤول)
+  const drawCharts = () => {
+    const inPeriod = (t) => {
+      if (!dashPeriod) return true;
+      const from = toISO(addMonths(new Date(), -dashPeriod));
+      return traineeEndISO(t) >= from && t.startDate <= today;
+    };
+    const list = trainees.filter(inPeriod);
+    const deptCounts = Object.fromEntries(DEPARTMENTS.map((d) => [d.id, 0]));
+    list.forEach((t) => t.deptIds.forEach((d) => { if (d in deptCounts) deptCounts[d]++; }));
+    const maxDept = Math.max(1, ...Object.values(deptCounts));
+    $("#dash-dept-chart").innerHTML = `<div class="hbar-list">${DEPARTMENTS.map((d) => `
+      <div class="hbar" title="${d.ar}: ${deptCounts[d.id]} متدرب">
+        <div class="hbar-name">${d.ar}<small>${d.en}</small></div>
+        <div class="hbar-track"><div class="hbar-fill ${deptCounts[d.id] ? "" : "zero"}" style="width:${(deptCounts[d.id] / maxDept) * 100}%"></div></div>
+        <div class="hbar-val">${deptCounts[d.id]}</div>
+      </div>`).join("")}</div>`;
+
+    const monthCols = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = addMonths(new Date(), -i);
+      monthCols.push({ key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, label: MONTH_AR[d.getMonth()], count: 0 });
+    }
+    trainees.forEach((t) => { const m = monthCols.find((c) => t.startDate?.startsWith(c.key)); if (m) m.count++; });
+    const maxMonth = Math.max(1, ...monthCols.map((c) => c.count));
+    $("#dash-month-chart").innerHTML = `
+      <div class="vbar-wrap">${monthCols.map((c) => `
+        <div class="vbar-col" title="${c.label}: ${c.count}">
+          <div class="vbar-num">${c.count}</div>
+          <div class="vbar" style="height:${(c.count / maxMonth) * 100}%"></div>
+        </div>`).join("")}</div>
+      <div class="vbar-labels">${monthCols.map((c) => `<span>${c.label}</span>`).join("")}</div>`;
+  };
+
+  $$("#dash-filter button").forEach((b) => b.addEventListener("click", () => {
+    dashFilter = b.dataset.f;
+    $$("#dash-filter button").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b); });
+    drawTable();
   }));
-  $$(".stat-value").forEach((el) => animateCount(el, Number(el.dataset.count)));
+  searchHandler = drawTable;
+  drawTable();
+  drawSide();
+  if (isAdmin) {
+    drawCharts();
+    $$("#dash-period button").forEach((b) => b.addEventListener("click", () => {
+      dashPeriod = Number(b.dataset.p);
+      $$("#dash-period button").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b); });
+      $("#dash-period").closest(".card").querySelector(".card-sub").textContent =
+        `المتدربون الذين تتقاطع فترتهم مع ${dashPeriod ? `آخر ${durationLabel(dashPeriod)}` : "كامل السجل"}`;
+      drawCharts();
+    }));
+  }
+  if (focusForm && dashSelected) $("#dash-side .rate-btn")?.focus();
 }
 
 // ═══════════════ تسجيل متدرب ═══════════════
@@ -640,22 +822,19 @@ async function renderTrainees() {
     <div class="view card">
       <div class="card-head">
         <div><h3 class="card-title">سجل المتدربين</h3>
-          <p class="card-sub" style="margin:0">البحث بالاسم أو رقم الهوية أو فترة التدريب</p></div>
-        <button class="btn btn-primary btn-sm" id="go-register">${ic("plus", 16)} متدرب جديد</button>
+          <p class="card-sub" style="margin:0">ابحث بالاسم أو رقم الهوية من شريط البحث أعلى الصفحة، أو صفِّ حسب فترة التدريب</p></div>
       </div>
       <div class="search-bar">
-        <label class="field"><input id="q-text" placeholder="بحث بالاسم أو رقم الهوية…" aria-label="بحث بالاسم أو رقم الهوية" /></label>
-        <label class="field" style="flex:0 0 auto"><input id="q-from" type="date" title="تدريب يتقاطع مع الفترة من" /></label>
-        <label class="field" style="flex:0 0 auto"><input id="q-to" type="date" title="إلى" /></label>
-        <button class="btn btn-ghost btn-sm" id="q-clear">مسح</button>
+        <label class="field field-inline"><span>من</span><input id="q-from" type="date" aria-label="تدريب يتقاطع مع الفترة من" /></label>
+        <label class="field field-inline"><span>إلى</span><input id="q-to" type="date" aria-label="إلى" /></label>
+        <button type="button" class="btn btn-outline btn-sm" id="q-clear">${ic("close", 15)} مسح التصفية</button>
       </div>
       <div id="trainee-table"></div>
     </div>`;
 
-  $("#go-register").addEventListener("click", () => go("register"));
 
   const draw = () => {
-    const txt = $("#q-text").value.trim().toLowerCase();
+    const txt = searchQ();
     const from = $("#q-from").value, to = $("#q-to").value;
     const list = trainees.filter((t) => {
       const matchTxt = !txt || t.name.toLowerCase().includes(txt) || t.nationalId.includes(txt);
@@ -698,8 +877,9 @@ async function renderTrainees() {
     }));
   };
 
-  ["q-text", "q-from", "q-to"].forEach((id) => $("#" + id).addEventListener("input", draw));
-  $("#q-clear").addEventListener("click", () => { $("#q-text").value = $("#q-from").value = $("#q-to").value = ""; draw(); });
+  ["q-from", "q-to"].forEach((id) => $("#" + id).addEventListener("input", draw));
+  $("#q-clear").addEventListener("click", () => { $("#top-search").value = $("#q-from").value = $("#q-to").value = ""; draw(); });
+  searchHandler = draw;
   draw();
 }
 
@@ -873,8 +1053,7 @@ async function renderReports() {
           <p class="card-sub" style="margin:0">ابحث باسم المتدرب أو صفِّ حسب القسم، ثم صدّر التقرير النهائي</p></div>
       </div>
       <div class="search-bar">
-        <label class="field"><input id="r-text" placeholder="بحث باسم المتدرب…" aria-label="بحث باسم المتدرب" /></label>
-        <label class="field" style="flex:0 0 auto">
+        <label class="field field-inline"><span>القسم</span>
           <select id="r-dept">
             <option value="">كل الأقسام</option>
             ${DEPARTMENTS.map((d) => `<option value="${d.id}">${d.ar} · ${d.en}</option>`).join("")}
@@ -884,7 +1063,7 @@ async function renderReports() {
     </div>`;
 
   const draw = () => {
-    const txt = $("#r-text").value.trim().toLowerCase();
+    const txt = searchQ();
     const dept = $("#r-dept").value;
     const list = trainees.filter((t) => {
       const tEvals = byTrainee[t.id] || [];
@@ -917,8 +1096,8 @@ async function renderReports() {
     $$("#report-table [data-print]").forEach((b) => b.addEventListener("click", () =>
       printFinalReport(trainees.find((t) => t.id === b.dataset.print), byTrainee[b.dataset.print] || [])));
   };
-  $("#r-text").addEventListener("input", draw);
   $("#r-dept").addEventListener("change", draw);
+  searchHandler = draw;
   draw();
 }
 
@@ -961,8 +1140,12 @@ function renderGuide() {
 
   const sections = isAdmin ? [
     { icon: "dashboard", title: "لوحة المعلومات", body: `
-      <p>نظرة سريعة على أعداد المتدربين: متدربو الفترة، المتدربون على رأس التدريب الآن، من أكملوا التدريب، وعدد التقييمات المسجلة.</p>
-      ${step(["اختر الفترة من الأزرار أعلى اللوحة (شهر، شهران، 3 أشهر، 6 أشهر، الكل).", "تتحدث البطاقات والمخططات حسب الفترة المختارة."])}
+      <p>أربع بطاقات مؤشرات: إجمالي المتدربين، متوسط التقييم، المكتمل (قيّمته كل أقسامه)، وبانتظار التقييم (انتهت فترته ولم تكتمل تقييماته).</p>
+      ${step([
+        "صفِّ جدول المتدربين بأزرار الحالة: الكل، جارٍ، مكتمل، بانتظار التقييم.",
+        "اضغط على أي متدرب ليظهر بجانب الجدول ملخص تقييماته: المعدل العام ومعدل كل قسم، مع أزرار التفاصيل والتقرير النهائي.",
+        "أسفل اللوحة مخطط توزيع المتدربين على الأقسام (اختر الفترة من أزراره) ومخطط التسجيلات الشهرية.",
+      ])}
       ${go_("dashboard", "افتح لوحة المعلومات")}` },
     { icon: "userPlus", title: "تسجيل متدرب جديد", body: `
       ${step([
@@ -974,7 +1157,7 @@ function renderGuide() {
       <p class="guide-note">${ic("lightbulb", 16)} يوزّع النظام مدة التدريب بالتساوي على الأقسام المختارة بالترتيب، وأيام الدوام من الأحد إلى الخميس.</p>
       ${go_("register", "سجّل متدربًا")}` },
     { icon: "users", title: "المتدربون والبحث", body: `
-      <p>ابحث بالاسم أو رقم الهوية، أو حدّد نطاق تاريخ. لكل متدرب الأزرار التالية:</p>
+      <p>ابحث بالاسم أو رقم الهوية من شريط البحث أعلى الصفحة، أو حدّد نطاق تاريخ. لكل متدرب الأزرار التالية:</p>
       <ul class="guide-list">
         <li><b>التفاصيل:</b> الجدول التدريبي وحالة التقييم في كل قسم.</li>
         <li><b>تعديل:</b> تغيير البيانات أو المدة أو الأقسام، ويُعاد توليد الجدول تلقائيًا.</li>
@@ -982,10 +1165,10 @@ function renderGuide() {
         <li><b>حذف:</b> يطلب تأكيدًا قبل الحذف.</li>
       </ul>
       ${go_("trainees", "افتح قائمة المتدربين")}` },
-    { icon: "clipboard", title: "التقييمات والتقرير النهائي", body: `
+    { icon: "clipboard", title: "التقارير والتقرير النهائي", body: `
       <p>يتابع العمود «التقدم» عدد الأقسام التي قيّمت المتدرب من إجمالي أقسامه.</p>
       ${step(["اضغط <b>عرض التقييمات</b> لرؤية تقييم كل قسم وملاحظاته.", "اضغط <b>تصدير التقرير</b> لطباعة التقرير النهائي أو حفظه PDF (يتفعّل بعد أول تقييم)."])}
-      ${go_("reports", "افتح التقييمات")}` },
+      ${go_("reports", "افتح التقارير")}` },
     { icon: "key", title: "كلمات المرور والحسابات", body: `
       <p>من زر <b>تغيير كلمة المرور</b> أسفل القائمة الجانبية:</p>
       <ul class="guide-list">
@@ -996,16 +1179,20 @@ function renderGuide() {
     { icon: "search", title: "استعلام المتدرب", body: `
       <p>يستطيع المتدرب معرفة جدوله بدون حساب: من شاشة الدخول يختار تبويب <b>استعلام المتدرب</b> ويكتب رقم هويته.</p>` },
   ] : [
-    { icon: "users", title: "متدربو القسم", body: `
-      <p>تظهر هنا قائمة المتدربين المجدولين في قسمك مع فترة تدريب كل واحد وحالة تقييمه: <span class="badge badge-red">بانتظار التقييم</span> أو <span class="badge badge-green">مُقيَّم ✓</span>.</p>
-      ${go_("deptTrainees", "افتح متدربي القسم")}` },
+    { icon: "dashboard", title: "لوحة المعلومات", body: `
+      <p>مؤشرات قسمك: إجمالي المتدربين، متوسط التقييم، المكتمل، وبانتظار التقييم. تحتها جدول متدربي القسم وبجانبه نموذج التقييم.</p>
+      ${go_("dashboard", "افتح لوحة المعلومات")}` },
     { icon: "pen", title: "تقييم متدرب", body: `
       ${step([
-        "اضغط <b>تقييم</b> بجانب اسم المتدرب.",
-        "اختر تقديرًا لكل معيار من المعايير.",
-        "أضف ملاحظات إن وجدت (اختياري).",
-        "اضغط <b>حفظ التقييم</b>. تقدر تعدّله لاحقًا من زر <b>تعديل التقييم</b>.",
-      ])}` },
+        "اضغط <b>تقييم جديد</b> في الترويسة أو القائمة، أو اختر المتدرب من جدول لوحة المعلومات.",
+        "اختر درجة من 1 إلى 4 لكل معيار: 1 مقبول، 2 جيد، 3 جيد جدًا، 4 ممتاز.",
+        "يظهر المعدل محسوبًا تلقائيًا تحت المعايير.",
+        "أضف اسم المُقيِّم والملاحظات إن وجدت، ثم اضغط <b>حفظ التقييم</b>. تقدر تعدّله لاحقًا بنفس الطريقة.",
+      ])}
+      ${go_("newEval", "ابدأ تقييمًا")}` },
+    { icon: "users", title: "المتدربون", body: `
+      <p>قائمة المتدربين المجدولين في قسمك مع فترة كل واحد في القسم وحالة تقييمه: <span class="badge badge-amber">بانتظار التقييم</span> أو <span class="badge badge-green">مُقيَّم</span>.</p>
+      ${go_("deptTrainees", "افتح المتدربين")}` },
     { icon: "key", title: "تغيير كلمة المرور", body: `
       <p>من زر <b>تغيير كلمة المرور</b> أسفل القائمة الجانبية: أدخل كلمتك الحالية ثم الجديدة مرتين. إذا نسيت كلمتك، اطلب من مسؤول التدريب إعادة تعيينها.</p>` },
   ];
@@ -1036,11 +1223,11 @@ function renderGuide() {
           <div class="guide-body">${scale}</div>
         </details>
         <details class="card guide-item">
-          <summary><span class="guide-ic">${ic("moon", 19)}</span><span class="guide-title">المظهر والجوال</span><span class="guide-chev">${ic("chevron", 18)}</span></summary>
+          <summary><span class="guide-ic">${ic("search", 19)}</span><span class="guide-title">البحث والجوال والطباعة</span><span class="guide-chev">${ic("chevron", 18)}</span></summary>
           <div class="guide-body">
             <ul class="guide-list">
-              <li>بدّل بين الوضع الفاتح والداكن من أسفل القائمة الجانبية، ويتذكر الموقع اختيارك.</li>
-              <li>على الجوال افتح القائمة من زر ${ic("menu", 15)} أعلى الشاشة.</li>
+              <li>شريط البحث في الترويسة يصفّي جدول الصفحة الحالية بالاسم أو رقم الهوية، ومن الصفحات اللي ما فيها جدول ينقلك لقائمة المتدربين.</li>
+              <li>على الجوال تصير القائمة شريطًا أفقيًا أعلى الشاشة، اسحبه يمين ويسار لباقي الصفحات.</li>
               <li>لحفظ أي تقرير PDF: اضغط زر الطباعة واختر <b>Save as PDF</b>.</li>
             </ul>
           </div>
@@ -1065,14 +1252,11 @@ async function renderDeptTrainees() {
         <div><h3 class="card-title">متدربو قسم ${d.ar} <span class="muted" style="font-size:13px">${d.en}</span></h3>
           <p class="card-sub" style="margin:0">قيّم كل متدرب مرّ على القسم — يمكن تعديل التقييم لاحقًا</p></div>
       </div>
-      <div class="search-bar">
-        <label class="field"><input id="d-text" placeholder="بحث بالاسم أو رقم الهوية…" aria-label="بحث بالاسم أو رقم الهوية" /></label>
-      </div>
       <div id="dept-table"></div>
     </div>`;
 
   const draw = () => {
-    const txt = $("#d-text").value.trim().toLowerCase();
+    const txt = searchQ();
     const list = trainees.filter((t) => !txt || t.name.toLowerCase().includes(txt) || t.nationalId.includes(txt));
     $("#dept-table").innerHTML = !list.length
       ? `<div class="empty-state"><div class="big">${ic("users", 34)}</div>لا يوجد متدربون مجدولون في هذا القسم</div>`
@@ -1089,7 +1273,7 @@ async function renderDeptTrainees() {
               <td class="num">${esc(t.nationalId)}</td>
               <td class="num">${seg ? `${fmtDate(seg.from)} — ${fmtDate(seg.to)}` : "—"}</td>
               <td>${status}</td>
-              <td>${ev ? `<span class="badge badge-green">مُقيَّم ✓</span>` : `<span class="badge badge-red">بانتظار التقييم</span>`}</td>
+              <td>${ev ? `<span class="badge badge-green">مُقيَّم · ${fmtAvg(evalAvg(ev))}</span>` : `<span class="badge badge-amber">بانتظار التقييم</span>`}</td>
               <td><button class="btn ${ev ? "btn-outline" : "btn-primary"} btn-sm" data-ev="${t.id}">${ev ? `${ic("edit", 15)} تعديل التقييم` : `${ic("pen", 15)} تقييم`}</button></td>
             </tr>`;
           }).join("")}</tbody></table></div>`;
@@ -1099,8 +1283,107 @@ async function renderDeptTrainees() {
       openEvaluationForm(t, evals.find((e) => e.traineeId === t.id));
     }));
   };
-  $("#d-text").addEventListener("input", draw);
+  searchHandler = draw;
   draw();
+}
+
+// نموذج تقييم: معيار لكل صف، أزرار 1–4 (44px) تقابل التقديرات المحفوظة، والمعدل يُحسب تلقائيًا
+function evalFormHTML(existing) {
+  return `
+    <form class="eval-form" novalidate>
+      <p class="rate-legend">${RATINGS.map((r, i) => `<span><b>${i + 1}</b> ${r.ar}</span>`).join("")}</p>
+      <div class="rate-grid">
+        ${CRITERIA.map((c) => {
+          const cur = existing?.scores?.[c.id];
+          return `
+          <div class="rate-row" data-crit="${c.id}">
+            <div class="rate-crit" id="crit-${c.id}">${c.ar}<small>${c.en}</small></div>
+            <div class="rate-opts" role="radiogroup" aria-labelledby="crit-${c.id}">
+              ${RATINGS.map((r, i) => `<button type="button" class="rate-btn ${cur === r.id ? "on" : ""}" data-r="${r.id}"
+                role="radio" aria-checked="${cur === r.id}" aria-label="${i + 1} — ${r.ar}" title="${r.ar} · ${r.en}">${i + 1}</button>`).join("")}
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+      <div class="avg-box live" aria-live="polite">
+        <span>المعدل المحسوب</span>
+        <b class="ef-avg">—<small> من ${MAX_SCORE}</small></b>
+        <span class="badge badge-gray ef-avg-label">أكمل المعايير</span>
+      </div>
+      <label class="field"><span>اسم المُقيِّم (اختياري)</span>
+        <input class="ef-name" value="${esc(existing?.evaluatorName || "")}" placeholder="اسم رئيس القسم أو المشرف" /></label>
+      <label class="field"><span>ملاحظات (اختياري)</span>
+        <textarea class="ef-notes" rows="3" placeholder="ملاحظات إضافية…">${esc(existing?.notes || "")}</textarea></label>
+      <p class="form-error hidden ef-error" role="alert"></p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-block ef-save">${ic("save")} حفظ التقييم</button>
+      </div>
+    </form>`;
+}
+
+function bindEvalForm(root, t, existing, onSaved) {
+  const me = session.user;
+  const form = $(".eval-form", root);
+  const refresh = () => {
+    const picked = $$(".rate-row", form).map((row) => $(".rate-btn.on", row)?.dataset.r).filter(Boolean);
+    const avg = avgOf([{ scores: Object.fromEntries(picked.map((r, i) => [i, r])) }]);
+    $(".ef-avg", form).innerHTML = `${fmtAvg(avg)}<small> من ${MAX_SCORE}</small>`;
+    const lbl = $(".ef-avg-label", form);
+    const complete = picked.length === CRITERIA.length;
+    lbl.textContent = avg == null ? "أكمل المعايير" : `${ratingForAvg(avg).ar}${complete ? "" : ` · ${picked.length}/${CRITERIA.length}`}`;
+    lbl.className = `badge ef-avg-label ${complete ? "badge-gold" : "badge-gray"}`;
+  };
+  $$(".rate-row", form).forEach((row) => {
+    const btns = $$(".rate-btn", row);
+    btns.forEach((btn, i) => {
+      btn.addEventListener("click", () => {
+        btns.forEach((o) => { o.classList.toggle("on", o === btn); o.setAttribute("aria-checked", o === btn); });
+        row.classList.remove("missing");
+        refresh();
+      });
+      // أسهم لوحة المفاتيح بين أزرار المعيار نفسه
+      btn.addEventListener("keydown", (e) => {
+        const d = e.key === "ArrowLeft" ? 1 : e.key === "ArrowRight" ? -1 : 0;
+        if (d) { e.preventDefault(); btns[(i + d + btns.length) % btns.length].focus(); }
+      });
+    });
+  });
+  refresh();
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const err = $(".ef-error", form);
+    err.classList.add("hidden");
+    const scores = {};
+    let firstMissing = null;
+    $$(".rate-row", form).forEach((row) => {
+      const sel = $(".rate-btn.on", row);
+      row.classList.toggle("missing", !sel);
+      if (!sel) firstMissing ||= row;
+      else scores[row.dataset.crit] = sel.dataset.r;
+    });
+    if (firstMissing) {
+      err.textContent = "الرجاء اختيار درجة لكل المعايير";
+      err.classList.remove("hidden");
+      $(".rate-btn", firstMissing).focus();
+      return;
+    }
+    const btn = $(".ef-save", form);
+    btn.disabled = true;
+    try {
+      await setDoc(doc(db, "evaluations", `${t.id}_${me.dept}`), {
+        traineeId: t.id, dept: me.dept, scores,
+        evaluatorName: $(".ef-name", form).value.trim(),
+        notes: $(".ef-notes", form).value.trim(),
+        updatedAt: serverTimestamp(),
+      });
+      toast("تم حفظ التقييم بنجاح");
+      onSaved?.();
+    } catch {
+      toast("تعذر حفظ التقييم", "err");
+      btn.disabled = false;
+    }
+  });
 }
 
 function openEvaluationForm(t, existing) {
@@ -1110,55 +1393,32 @@ function openEvaluationForm(t, existing) {
     <div class="modal-head"><h3>${ic("pen", 20)} تقييم: ${esc(t.name)}</h3>
       <button class="icon-btn" id="ev-close" aria-label="إغلاق">${ic("close")}</button></div>
     <p class="card-sub">قسم ${d.ar} — ${d.en} · اختر درجة لكل معيار</p>
-    <div class="rate-grid">
-      ${CRITERIA.map((c) => `
-        <div class="rate-row" data-crit="${c.id}">
-          <div class="rate-crit">${c.ar}<small>${c.en}</small></div>
-          <div class="rate-opts">
-            ${RATINGS.map((r) => `<button type="button" class="rate-opt ${existing?.scores?.[c.id] === r.id ? "on" : ""}" data-r="${r.id}">${r.en}</button>`).join("")}
-          </div>
-        </div>`).join("")}
-    </div>
-    <label class="field" style="margin-top:14px"><span>اسم المُقيِّم (اختياري)</span>
-      <input id="ev-name" value="${esc(existing?.evaluatorName || "")}" placeholder="اسم رئيس القسم أو المشرف" /></label>
-    <label class="field"><span>ملاحظات (اختياري)</span>
-      <textarea id="ev-notes" rows="2" placeholder="ملاحظات إضافية…">${esc(existing?.notes || "")}</textarea></label>
-    <p id="ev-error" class="form-error hidden"></p>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" id="ev-cancel">إلغاء</button>
-      <button class="btn btn-primary" id="ev-save">${ic("save")} حفظ التقييم</button>
-    </div>`);
-
-  $$(".rate-row").forEach((row) =>
-    $$(".rate-opt", row).forEach((opt) => opt.addEventListener("click", () => {
-      $$(".rate-opt", row).forEach((o) => o.classList.toggle("on", o === opt));
-    })));
+    ${evalFormHTML(existing)}`);
   $("#ev-close").addEventListener("click", closeModal);
-  $("#ev-cancel").addEventListener("click", closeModal);
-  $("#ev-save").addEventListener("click", async () => {
-    const scores = {};
-    let missing = false;
-    $$(".rate-row").forEach((row) => {
-      const sel = $(".rate-opt.on", row);
-      if (!sel) missing = true;
-      else scores[row.dataset.crit] = sel.dataset.r;
-    });
-    if (missing) {
-      $("#ev-error").textContent = "الرجاء اختيار درجة لكل المعايير";
-      $("#ev-error").classList.remove("hidden");
-      return;
-    }
-    try {
-      await setDoc(doc(db, "evaluations", `${t.id}_${me.dept}`), {
-        traineeId: t.id, dept: me.dept, scores,
-        evaluatorName: $("#ev-name").value.trim(),
-        notes: $("#ev-notes").value.trim(),
-        updatedAt: serverTimestamp(),
-      });
-      closeModal(); toast("تم حفظ التقييم بنجاح");
-      go("deptTrainees");
-    } catch { toast("تعذر حفظ التقييم", "err"); }
-  });
+  bindEvalForm($("#modal"), t, existing, () => { closeModal(); go(currentView); });
+}
+
+// ═══════════════ معايير التقييم ═══════════════
+
+function renderCriteria() {
+  $("#content").innerHTML = `
+    <div class="view grid-2 grid criteria-page">
+      <section class="card">
+        <h3 class="card-title">معايير التقييم</h3>
+        <p class="card-sub">يقيّم كل قسم المتدرب على هذه المعايير عند انتهاء فترته في القسم</p>
+        <ol class="criteria-list">
+          ${CRITERIA.map((c, i) => `<li><span class="crit-num">${i + 1}</span><span><b>${c.ar}</b><small>${c.en}</small></span></li>`).join("")}
+        </ol>
+      </section>
+      <section class="card">
+        <h3 class="card-title">سلّم التقديرات</h3>
+        <p class="card-sub">لكل تقدير درجة تُستخدم في حساب المعدل (من ${MAX_SCORE})</p>
+        <ul class="scale-list">
+          ${RATINGS.map((r, i) => `<li><span class="rate-btn on static">${i + 1}</span><span><b>${r.ar}</b><small>${r.en}</small></span></li>`).join("")}
+        </ul>
+        <p class="guide-note">${ic("lightbulb", 16)} المعدل = متوسط درجات المعايير. التقرير النهائي المطبوع يعرض التقدير نفسه لكل معيار.</p>
+      </section>
+    </div>`;
 }
 
 // ═══════════════ الطباعة: Time Sheet ═══════════════
