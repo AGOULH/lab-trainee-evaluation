@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=3" />
+  <link rel="stylesheet" href="css/style.css?v=4" />
 </head>
 <body>
 
@@ -33,56 +33,125 @@
   </div>
 
   <!-- ═══════════ شاشة الدخول ═══════════ -->
-  <div id="login-screen" class="fullscreen-center hidden">
-    <div class="login-wrap">
-      <div class="login-brand animate-fade-down">
-        <div class="brand-badge"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6.5L4.5 19A1.5 1.5 0 0 0 5.8 21h12.4a1.5 1.5 0 0 0 1.3-2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
-        <h1>نظام متدربي المختبر</h1>
-        <p>إدارة التسجيل، الجداول، الحضور، والتقييم</p>
+  <div id="login-screen" class="login-screen hidden">
+    <!-- لوحة الهوية -->
+    <section class="login-hero">
+      <svg class="hero-pattern" aria-hidden="true" width="100%" height="100%">
+        <defs>
+          <pattern id="hexgrid" width="56" height="97" patternUnits="userSpaceOnUse" patternTransform="scale(1.1)">
+            <path d="M28 0 L56 16.2 L56 48.5 L28 64.7 L0 48.5 L0 16.2 Z M28 64.7 L28 97" fill="none" stroke="currentColor" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#hexgrid)"/>
+      </svg>
+      <div class="hero-glow" aria-hidden="true"></div>
+
+      <div class="hero-top" aria-hidden="true">
+        <div class="brand-badge hero-badge"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.5L4.5 19A1.5 1.5 0 0 0 5.8 21h12.4a1.5 1.5 0 0 0 1.3-2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
+        <div class="hero-org">
+          <strong>المختبرات الطبية</strong>
+          <small>برنامج تدريب وتقييم المتدربين</small>
+        </div>
       </div>
 
-      <div class="login-card animate-pop">
-        <div class="tabs" role="tablist" aria-label="نوع الدخول">
-          <button class="tab active" data-tab="staff" role="tab">دخول الموظفين</button>
-          <button class="tab" data-tab="trainee" role="tab">استعلام المتدرب</button>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 320 220" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- جزيء -->
+          <g class="art-molecule" opacity=".55" stroke-width="1.8">
+            <line x1="40" y1="52" x2="78" y2="30"/><line x1="78" y1="30" x2="116" y2="52"/><line x1="78" y1="30" x2="78" y2="0"/>
+            <circle cx="40" cy="52" r="8" fill="var(--hero-ink-fill)"/><circle cx="78" cy="30" r="10" fill="var(--hero-ink-fill)"/><circle cx="116" cy="52" r="7" fill="var(--hero-ink-fill)"/>
+          </g>
+          <!-- دورق -->
+          <g class="art-flask">
+            <path d="M150 70h36"/><path d="M156 70v44l-38 70a8 8 0 0 0 7 12h86a8 8 0 0 0 7-12l-38-70V70"/>
+            <path class="art-liquid" d="M128 166c14-7 26 7 40 0s26 7 40 0l13 24a6 6 0 0 1-5 9h-90a6 6 0 0 1-5-9z" fill="currentColor" stroke="none"/>
+            <circle class="art-bubble b1" cx="160" cy="150" r="4"/><circle class="art-bubble b2" cx="176" cy="138" r="3"/><circle class="art-bubble b3" cx="168" cy="122" r="2.5"/>
+          </g>
+          <!-- أنابيب اختبار -->
+          <g class="art-tubes">
+            <rect x="236" y="96" width="62" height="10" rx="3"/>
+            <path d="M246 84v86a8 8 0 0 0 16 0V84"/><path d="M272 84v86a8 8 0 0 0 16 0V84"/>
+            <path d="M246 136h16v34a8 8 0 0 1-16 0z" fill="var(--gold)" stroke="none" opacity=".9"/>
+            <path d="M272 120h16v50a8 8 0 0 1-16 0z" fill="currentColor" stroke="none" opacity=".35"/>
+            <line x1="230" y1="206" x2="304" y2="206"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="hero-copy">
+        <h1>نظام إدارة وتقييم<br/>متدربي المختبر</h1>
+        <p>منصة موحّدة لمتابعة رحلة المتدرب داخل أقسام المختبر — من التسجيل حتى التقييم النهائي.</p>
+        <ul class="hero-features">
+          <li><span class="hf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>جداول تدريب تلقائية على الأقسام</li>
+          <li><span class="hf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>تسجيل الحضور والانصراف</li>
+          <li><span class="hf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>تقييم الأداء من كل قسم</li>
+        </ul>
+      </div>
+
+      <p class="hero-foot" aria-hidden="true">© <span>نظام متدربي المختبر</span></p>
+    </section>
+
+    <!-- نموذج الدخول -->
+    <section class="login-side">
+      <div class="login-wrap animate-pop">
+        <div class="login-mobile-brand">
+          <div class="brand-badge sm"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6.5L4.5 19A1.5 1.5 0 0 0 5.8 21h12.4a1.5 1.5 0 0 0 1.3-2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
+          <strong>نظام متدربي المختبر</strong>
         </div>
 
-        <form id="login-form" class="tab-panel" data-panel="staff">
-          <label class="field">
-            <span>الحساب</span>
-            <select id="login-username" required>
-              <!-- تُعبأ الخيارات تلقائيًا: مسؤول التدريب + الأقسام السبعة -->
-            </select>
-          </label>
-          <label class="field">
-            <span>كلمة المرور</span>
-            <div class="password-wrap">
-              <input type="password" id="login-password" autocomplete="current-password" required dir="ltr" placeholder="••••••••" />
-              <button type="button" class="password-toggle" id="toggle-password" aria-label="إظهار كلمة المرور" aria-pressed="false">
-                <svg class="eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg class="eye-closed hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.4 10.4 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c6.5 0 10 7 10 7a18.6 18.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-              </button>
-            </div>
-          </label>
-          <p id="login-error" class="form-error hidden" role="alert"></p>
-          <button type="submit" class="btn btn-primary btn-block" id="login-btn">
-            <span class="btn-label">تسجيل الدخول</span>
-          </button>
-        </form>
+        <div class="login-head">
+          <span class="login-eyebrow">بوابة الدخول</span>
+          <h2>مرحبًا بك</h2>
+          <p>سجّل الدخول لحسابك، أو استعلم عن جدولك التدريبي برقم الهوية.</p>
+        </div>
 
-        <form id="trainee-lookup-form" class="tab-panel hidden" data-panel="trainee">
-          <label class="field">
-            <span>رقم الهوية</span>
-            <input type="text" id="lookup-id" inputmode="numeric" required dir="ltr" placeholder="1234567890" />
-          </label>
-          <p id="lookup-error" class="form-error hidden" role="alert"></p>
-          <button type="submit" class="btn btn-primary btn-block">
-            <span class="btn-label">عرض جدولي التدريبي</span>
-          </button>
-        </form>
+        <div class="login-card">
+          <div class="tabs" role="tablist" aria-label="نوع الدخول">
+            <button class="tab active" data-tab="staff" role="tab"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>دخول الموظفين</button>
+            <button class="tab" data-tab="trainee" role="tab"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><line x1="13" y1="10" x2="18" y2="10"/><line x1="13" y1="14" x2="17" y2="14"/></svg>استعلام المتدرب</button>
+          </div>
+
+          <form id="login-form" class="tab-panel" data-panel="staff">
+            <label class="field">
+              <span>الحساب</span>
+              <select id="login-username" required>
+                <!-- تُعبأ الخيارات تلقائيًا: مسؤول التدريب + الأقسام السبعة -->
+              </select>
+            </label>
+            <label class="field">
+              <span>كلمة المرور</span>
+              <div class="password-wrap">
+                <input type="password" id="login-password" autocomplete="current-password" required dir="ltr" placeholder="••••••••" />
+                <button type="button" class="password-toggle" id="toggle-password" aria-label="إظهار كلمة المرور" aria-pressed="false">
+                  <svg class="eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed hidden" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.4 10.4 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c6.5 0 10 7 10 7a18.6 18.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                </button>
+              </div>
+            </label>
+            <p id="login-error" class="form-error hidden" role="alert"></p>
+            <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+              <span class="btn-label">تسجيل الدخول</span>
+            </button>
+          </form>
+
+          <form id="trainee-lookup-form" class="tab-panel hidden" data-panel="trainee">
+            <label class="field">
+              <span>رقم الهوية</span>
+              <input type="text" id="lookup-id" inputmode="numeric" required dir="ltr" placeholder="1234567890" />
+            </label>
+            <p id="lookup-error" class="form-error hidden" role="alert"></p>
+            <button type="submit" class="btn btn-primary btn-block">
+              <span class="btn-label">عرض جدولي التدريبي</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="login-foot">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>نسيت كلمة المرور؟ تواصل مع مسؤول التدريب لإعادة تعيينها.</span>
+        </div>
       </div>
-      <p class="login-foot">نسيت كلمة المرور؟ تواصل مع مسؤول التدريب لإعادة تعيينها.</p>
-    </div>
+    </section>
   </div>
 
   <!-- ═══════════ استعلام المتدرب: عرض الجدول ═══════════ -->
